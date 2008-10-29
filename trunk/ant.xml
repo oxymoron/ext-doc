@@ -10,21 +10,21 @@
     <target name="clean">
         <delete dir="bin"/>
         <delete dir="build"/>
-        <delete dir="java/src/main/azubkov/jsdoc/schema"/>
+        <delete dir="java/src/main/extdoc/jsdoc/schema"/>
     </target>
 
     <target name="compile">
         <mkdir dir="bin"/>
-        <xjc schema="resources/schema/build-doc.xsd" destdir="java/src/main" package="main.extdoc.jsdoc.schema"/>
+        <xjc schema="schema/ext-doc.xsd" destdir="java/src/main" package="extdoc.jsdoc.schema"/>
         <javac srcdir="java/src/main" destdir="bin"/>        
     </target>
 
     <target name="jar" depends="compile">
         <mkdir dir="build"/>
-        <jar destfile="build/build-doc.jar">
+        <jar destfile="build/ext-doc.jar">
             <fileset dir="bin" includes="**/*.class"/>
             <manifest>
-                <attribute name="Main-Class" value="azubkov.jsdoc.Main"/>
+                <attribute name="Main-Class" value="extdoc.jsdoc.Main"/>
             </manifest>
         </jar>
     </target>

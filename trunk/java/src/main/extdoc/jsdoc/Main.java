@@ -1,4 +1,4 @@
-package main.extdoc.jsdoc;
+package extdoc.jsdoc;
 
 /**
  * User: Andrey Zubkov
@@ -6,4 +6,7 @@ package main.extdoc.jsdoc;
  * Time: 23:12:16
  */
 public class Main {
+    public static void main(String[] args) {
+        System.out.println("Test");        
+    }
 }
