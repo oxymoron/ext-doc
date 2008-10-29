@@ -1,4 +1,4 @@
-package extdoc.jsdoc;
+package main.extdoc.jsdoc;
 
 /**
  * User: Andrey Zubkov
