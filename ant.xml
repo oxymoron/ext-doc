@@ -24,7 +24,7 @@
         <jar destfile="build/ext-doc.jar">
             <fileset dir="bin" includes="**/*.class"/>
             <manifest>
-                <attribute name="Main-Class" value="extdoc.jsdoc.Main"/>
+                <attribute name="Main-Class" value="extdoc.Main"/>
             </manifest>
         </jar>
     </target>
