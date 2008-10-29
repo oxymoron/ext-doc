@@ -1,0 +1,1 @@
+java -jar ../build/ext-doc.jar ext.xml c:\wamp\www\exthelp\output ../template/ext 

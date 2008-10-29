@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc version="0.9">
+	<source>
+		<file src="ext/source/core/Ext.js"/>
+		<file src="ext/source/widgets/Component.js"/>
+        <file src="ext/source/widgets/Button.js"/>
+        <file src="ext/source/data/Record.js"/>
+    </source>
+</doc>
