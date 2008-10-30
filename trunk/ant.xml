@@ -18,7 +18,7 @@
         <xjc schema="schema/ext-doc.xsd" destdir="java/src/main" package="extdoc.jsdoc.schema"/>
         <javac srcdir="java/src/main" destdir="bin"/>        
     </target>
-
+                                                                                
     <target name="jar" depends="compile">
         <mkdir dir="build"/>
         <jar destfile="build/ext-doc.jar">

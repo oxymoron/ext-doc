@@ -1,12 +1,20 @@
 package extdoc;
 
+import extdoc.jsdoc.processor.FileProcessor;
+
 /**
  * User: Andrey Zubkov
- * Date: 29.10.2008
- * Time: 23:12:16
+ * Date: 25.10.2008
+ * Time: 2:16:18
  */
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Test");        
+        String xmlFileName = args[0];
+        String outputFolderName = args[1];
+        String templateFileName = args[2];
+        FileProcessor processor = new FileProcessor();
+        processor.process(xmlFileName);
+        processor.saveToFolder(outputFolderName, templateFileName);
     }
 }
