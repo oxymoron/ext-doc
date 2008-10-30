@@ -6,4 +6,5 @@ package extdoc.jsdoc.tags;
  * Time: 21:56:26
  */
 public interface Tag {
+    String name();
 }
