@@ -149,6 +149,8 @@ public class Comment {
                     TagImpl tag;
                     if (tagName.equals("@class")){
                         tag = new ClassTagImpl(tagName, tx);
+                    }else if (tagName.equals("@param")){
+                        tag = new ParamTagImpl(tagName, tx);                        
                     }else{
                         tag = new TagImpl(tagName, tx);
                     }

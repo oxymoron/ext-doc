@@ -41,4 +41,28 @@ class TagImpl implements Tag{
         return str;
     }
 
+    String removeBrackets(String text){
+        int len = text.length();
+        int start = text.charAt(0)=='{'?1:0;
+        int end = text.charAt(len-1)=='}'?len-1:len;
+        return text.substring(start, end);
+    }
+
+    private static final String OPTIONAL_U = "(Optional)";
+    private static final String OPTIONAL_L = "(optional)";
+    private static final int OPTIONAL_LEN = OPTIONAL_U.length();
+
+    boolean isOptional(String text){        
+        return (text.startsWith(OPTIONAL_U)
+                || text.startsWith(OPTIONAL_L));
+    }
+
+    String cutOptional(String text){
+        String str = text;
+        if (isOptional(text)){
+            str = text.substring(OPTIONAL_LEN+1);            
+        }
+        return str;
+    }
+
 }
