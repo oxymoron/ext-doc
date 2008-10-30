@@ -2,7 +2,6 @@ package extdoc.jsdoc.processor;
 
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.schema.Doc;
-import extdoc.jsdoc.schema.File;
 import extdoc.jsdoc.schema.Source;
 import extdoc.jsdoc.tags.TagParam;
 import org.w3c.dom.Document;
@@ -17,12 +16,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -187,35 +181,90 @@ public class FileProcessor{
     }
 
     private void processComment(String content, String extraLine){
-
-        if(classSigature.matcher(content).find()){
-            processClass(content);
-        }else if(cfgSigature.matcher(content).find()){
-            processCfg(content);
-        }else if(eventSigature.matcher(content).find()){
-            processEvent(content);
-        }else if(propertySigature.matcher(content).find()){
-            processProperty(content, extraLine);
-        }else{
-            processMethod(content, extraLine);
-        }
+        System.out.println(content);    
+        System.out.println(extraLine);         
+//        if(classSigature.matcher(content).find()){
+//            processClass(content);
+//        }else if(cfgSigature.matcher(content).find()){
+//            processCfg(content);
+//        }else if(eventSigature.matcher(content).find()){
+//            processEvent(content);
+//        }else if(propertySigature.matcher(content).find()){
+//            processProperty(content, extraLine);
+//        }else{
+//            processMethod(content, extraLine);
+//        }
     }
 
+    private enum State {CODE, COMMENT}
+    private enum ExtraState {SKIP, SPACE, READ}   
+
+    private static final String START_COMMENT = "/**";
+    private static final String END_COMMENT = "*/";
+
+    private boolean endsWith(StringBuilder sb, String str){
+        int len = sb.length();
+        int strLen = str.length();        
+        return (len>=strLen && sb.substring(len-strLen).equals(str));
+    }
+
+    private boolean isWhite(char ch){
+        return !Character.isLetterOrDigit(ch);
+    }
 
     private void processFile(String fileName){
         try {
-            java.io.File file = new java.io.File(fileName);
+            File file = new File(fileName);
             currFile = file.getName();
-            FileChannel fc = new FileInputStream(file).getChannel();
-            ByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-            CharBuffer cb = Charset.forName("8859_1").newDecoder().decode(bb);
-            Matcher matcher = commentPattern.matcher(cb);
-            while(matcher.find()){
-                processComment(
-                        contentFilterPattern.matcher(matcher.group(1)).replaceAll("\n"),
-                        matcher.group(2));
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            int numRead;
+            State state = State.CODE;
+            ExtraState extraState = ExtraState.SKIP;            
+            StringBuilder buffer = new StringBuilder();
+            StringBuilder extraBuffer = new StringBuilder();            
+            String comment=null;
+            char ch;
+            while((numRead=reader.read())!=-1){
+                ch =(char)numRead;
+                buffer.append(ch);
+                switch(state){
+                    case CODE:
+                        switch (extraState){
+                            case SKIP:
+                                break;
+                            case SPACE:
+                                if (isWhite(ch)){
+                                    break;
+                                }
+                                extraState = ExtraState.READ;
+                                /* fall through */
+                            case READ:
+                                if (isWhite(ch)){
+                                    extraState = ExtraState.SKIP;
+                                    break;
+                                }
+                                extraBuffer.append(ch);
+                                break;
+                        }                                            
+                        if (endsWith(buffer, START_COMMENT)){
+                            processComment(comment, extraBuffer.toString());
+                            extraBuffer.setLength(0);
+                            buffer.setLength(0);
+                            state = State.COMMENT;
+                        }
+                        break;
+                    case COMMENT:
+                       if (endsWith(buffer, END_COMMENT)){
+                            comment = buffer.substring(0, buffer.length()-END_COMMENT.length());
+                            buffer.setLength(0);
+                            state = State.CODE;
+                            extraState = ExtraState.SPACE;
+                        }
+                        break;
+                }
             }
-            fc.close();
+            processComment(comment, extraBuffer.toString());
+            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -253,15 +302,15 @@ public class FileProcessor{
 
     public void process(String fileName){
         try {
-            java.io.File xmlFile = new java.io.File(fileName);
+            File xmlFile = new File(fileName);
             FileInputStream fileInputStream = new FileInputStream(xmlFile);
             JAXBContext jaxbContext = JAXBContext.newInstance("extdoc.jsdoc.schema");
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             Doc doc = (Doc) unmarshaller.unmarshal(fileInputStream);
             Source source = doc.getSource();
-            List<File> files = source.getFile();
-            for(File file: files){
-                processFile(xmlFile.getParent()+ java.io.File.separator +file.getSrc());
+            List<extdoc.jsdoc.schema.File> files = source.getFile();
+            for(extdoc.jsdoc.schema.File file: files){
+                processFile(xmlFile.getParent()+ File.separator +file.getSrc());
             }
             fileInputStream.close();
             populateTree();
@@ -275,7 +324,7 @@ public class FileProcessor{
 
 
     private void createResources(String folderName){
-       java.io.File file = new java.io.File(folderName);
+       File file = new File(folderName);
        file.mkdirs();
     }
 
@@ -294,11 +343,11 @@ public class FileProcessor{
             Transformer transformer = transformation.newTransformer();
 
             for(DocClass docClass: classes){
-                String targetFileName = folderName+java.io.File.separator+docClass.className+".html";
+                String targetFileName = folderName+File.separator+docClass.className+".html";
                 Document doc = builderFactory.newDocumentBuilder().newDocument();
                 marshaller.marshal(docClass, doc);
-                marshaller.marshal(docClass, new java.io.File(targetFileName+"_"));
-                Result fileResult = new StreamResult(new java.io.File(targetFileName));
+                marshaller.marshal(docClass, new File(targetFileName+"_"));
+                Result fileResult = new StreamResult(new File(targetFileName));
                 transformer.transform(new DOMSource(doc), fileResult);
             }
         } catch (JAXBException e) {
