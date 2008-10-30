@@ -3,7 +3,6 @@ package extdoc.jsdoc.processor;
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.schema.Doc;
 import extdoc.jsdoc.schema.Source;
-import extdoc.jsdoc.tags.TagParam;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -19,8 +18,6 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -37,164 +34,118 @@ public class FileProcessor{
     public List<DocEvent> events = new ArrayList<DocEvent>();
 
     final static String OUT_FILE_EXTENSION = "html";
-
-    final static Pattern commentPattern = Pattern.compile("/\\*\\*((?:.|[\\n\\r])*?)\\*/[\\r\\n](.*)");
-    final static Pattern contentFilterPattern = Pattern.compile("[\\r\\n]\\s*\\*\\s*");
-
-
-    final static Pattern classSigature = Pattern.compile("@class");
-    final static Pattern cfgSigature = Pattern.compile("@cfg");
-    final static Pattern eventSigature = Pattern.compile("@event");
-    final static Pattern propertySigature = Pattern.compile("@property|@type");
-    final static Pattern methodSigature = Pattern.compile("@method|@member|@return");
-
-    final static Pattern cedPattern = Pattern.compile("@class (\\S*)[\\r\\n](?:@extends (\\S*)[\\r\\n])?((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n](?=@))");
-    final static Pattern singletonPattern = Pattern.compile("@singleton");
-    final static Pattern constructorPattern = Pattern.compile("@constructor((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n](?=@))");
-    final static Pattern paramPattern = Pattern.compile("@param \\{(\\S*)\\} (\\S*)( \\((?:O|o)ptional\\)|)((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n](?=@))");
-    final static Pattern cfgPattern = Pattern.compile("@cfg \\{(\\S*)\\} (\\S*)( \\((?:O|o)ptional\\)|)((?:.|[\\r\\n])*)");
-    final static Pattern eventDescrPattern = Pattern.compile("@event (\\S*)((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n](?=@))");
-    final static Pattern extraNamePattern = Pattern.compile("\\s*(\\w*)");
-    final static Pattern propertyPattern = Pattern.compile("@property (\\S*)");
-    final static Pattern typePattern = Pattern.compile("@type \\{?([\\w\\.]*)\\}?");
-    final static Pattern descrPattern = Pattern.compile("((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n](?=@))");
-    final static Pattern methodPattern = Pattern.compile("@method (\\S*)");
-    final static Pattern memberPattern = Pattern.compile("@member (\\S*) (\\S*)");
-    final static Pattern returnPattern = Pattern.compile("@return \\{(\\S*)\\}((?:.|[\\r\\n])*?)(?:\\z|[\\r\\n]\\s*(?=@))");
-
     private String className;
-
     private String currFile;
 
-    private void processClass(String content) {
-
-        Matcher cedMatcher = cedPattern.matcher(content);
-        Matcher singletonMatcher = singletonPattern.matcher(content);
-        Matcher constructorMatcher = constructorPattern.matcher(content);
-        Matcher paramMatcher = paramPattern.matcher(content);
-
-        cedMatcher.find();
-        className = cedMatcher.group(1);
-
-        String parentClass = cedMatcher.group(2);
-
-        DocClass docClass = new DocClass();
-        docClass.className = className;
-        docClass.definedIn = currFile;
-        docClass.parentClass = parentClass!=null?parentClass:"Object";
-        docClass.description = cedMatcher.group(3);
-        docClass.singleton = singletonMatcher.find();
-        docClass.hasConstructor = constructorMatcher.find();
-        docClass.constructorDescription = docClass.hasConstructor?constructorMatcher.group(1):null;
-
-        while(paramMatcher.find()){
-            TagParam param = new TagParam();
-            param.type = paramMatcher.group(1);
-            param.name = paramMatcher.group(2);
-            param.optional = paramMatcher.group(3).length()>0;
-            param.description = paramMatcher.group(4);
-            docClass.params.add(param);
-        }
-        classes.add(docClass);
+    private void parseCommentComponent(String content, 
+                                       String tagName, int from, int upto) {
+        String tx = upto <= from ? "": content.substring(from, upto);
+        System.out.println(tx);        
     }
 
-    private void processCfg(String content) {
-        Matcher matcher = cfgPattern.matcher(content);
-        DocCfg cfg = new DocCfg();
-        if(matcher.find()){
-            cfg.type = matcher.group(1);
-            cfg.name = matcher.group(2);
-            cfg.optional = matcher.group(3).length()>0;
-            cfg.description = matcher.group(4);
-        }
-        cfg.className = className;
-        cfgs.add(cfg);
+    private enum CommentState {SPACE, DESCRIPTION}
+    private enum InnerState {TAG_NAME, TAG_GAP, IN_TEXT}
+
+    private boolean isStarWhite(char ch){
+        return Character.isWhitespace(ch) || ch=='*';
     }
 
-    private void processEvent(String content) {
-        Matcher matcher = eventDescrPattern.matcher(content);
-        Matcher paramMatcher = paramPattern.matcher(content);
-        DocEvent event = new DocEvent();
-        if(matcher.find()){
-            event.name = matcher.group(1);
-            event.description = matcher.group(2);
+    /**
+     * Processes inner comment text
+     * Very similar to Sun's com.sun.tools.javadoc#Comment
+     * @param content comment text
+     * @param extraLine one more "word" after comment (usually name)
+     */
+    private void processComment(String content, String extraLine) {
+        CommentState state = CommentState.SPACE;
+        StringBuilder buffer = new StringBuilder();
+        StringBuilder spaceBuffer = new StringBuilder();
+        boolean foundStar = false;
+        for (int i=0;i<content.length();i++){
+            char ch = content.charAt(i);
+            switch (state){
+                case SPACE:
+                    if (isStarWhite(ch)){
+                        if (ch == '*'){
+                            foundStar = true;
+                        }
+                        spaceBuffer.append(ch);
+                        break;
+                    }
+                    if (!foundStar){
+                        buffer.append(spaceBuffer);
+                    }
+                    spaceBuffer.setLength(0);
+                    state = CommentState.DESCRIPTION;
+                    /* fall through */
+                case DESCRIPTION:
+                    if (ch == '\n'){
+                        foundStar = false;
+                        state = CommentState.SPACE;
+                    }
+                    buffer.append(ch);
+                    break;
+            }
         }
-        while(paramMatcher.find()){
-            TagParam param = new TagParam();
-            param.type = paramMatcher.group(1);
-            param.name = paramMatcher.group(2);
-            param.optional = paramMatcher.group(3).length()>0;
-            param.description = paramMatcher.group(4);
-            event.params.add(param);
+
+        InnerState instate = InnerState.TAG_GAP;
+        String inner = buffer.toString();
+
+        String tagName = null;
+        int tagStart =0;
+        int textStart =0;
+        boolean newLine = true;
+        int lastNonWhite = -1;
+        int len = inner.length();
+        for(int i=0;i<len;i++){
+            char ch = inner.charAt(i);
+            boolean isWhite = Character.isWhitespace(ch);
+            switch (instate){
+                case TAG_NAME:
+                    if (isWhite){
+                        tagName = inner.substring(tagStart, i);
+                        instate = InnerState.TAG_GAP;
+                    }
+                    break;
+                case TAG_GAP:
+                    if (isWhite){
+                        break;
+                    }
+                    textStart = i;
+                    instate = InnerState.IN_TEXT;
+                    /* fall through */
+                case IN_TEXT:
+                    if (newLine && ch == '@'){
+                        parseCommentComponent(inner, tagName, textStart,
+                                lastNonWhite+1);
+                        tagStart = i;
+                        instate = InnerState.TAG_NAME;
+                    }
+                    break;
+            }
+            if (ch == '\n'){
+                newLine = true;
+            }else if(!isWhite){
+                lastNonWhite = i;
+                newLine = false;
+            }
         }
-        event.className = className;
-        events.add(event);
+        // Finish for last item
+        switch(instate){
+            case TAG_NAME:
+                tagName = inner.substring(tagStart, len);
+                /* fall through */
+            case TAG_GAP:
+                textStart = len;
+            case IN_TEXT:
+                parseCommentComponent(inner, tagName, textStart,
+                        lastNonWhite+1);
+                break;
+        }
+        
     }
 
-    private void processProperty(String content, String extraLine) {
-        Matcher propertyMatcher = propertyPattern.matcher(content);
-        Matcher typeMatcher = typePattern.matcher(content);
-        Matcher descrMatcher = descrPattern.matcher(content);
-        DocProperty property = new DocProperty();
-        if(propertyMatcher.find()){
-            property.name = propertyMatcher.group(1);
-        }else{
-            Matcher extraNameMatcher = extraNamePattern.matcher(extraLine);
-            property.name = extraNameMatcher.find()?extraNameMatcher.group(1):null;
-        }
-        property.type = typeMatcher.find()?typeMatcher.group(1):null;
-        property.description = descrMatcher.find()?descrMatcher.group(1):null;
-        property.className = className;
-        properties.add(property);
-    }
 
-    private void processMethod(String content, String extraLine) {
-        Matcher methodMatcher = methodPattern.matcher(content);
-        Matcher memberMatcher = memberPattern.matcher(content);
-        Matcher descrMatcher = descrPattern.matcher(content);
-        Matcher paramMatcher = paramPattern.matcher(content);
-        Matcher returnMatcher = returnPattern.matcher(content);
-        DocMethod method = new DocMethod();
-        if (methodMatcher.find()){
-            method.name = methodMatcher.group(1);
-        }else if (memberMatcher.find()){
-            method.name = memberMatcher.group(2);
-        }else{
-            Matcher extraNameMatcher = extraNamePattern.matcher(extraLine);
-            method.name = extraNameMatcher.find()?extraNameMatcher.group(1):null;
-        }
-        method.description = descrMatcher.find()?descrMatcher.group(1):null;
-        method.className = className;
-        while(paramMatcher.find()){
-            TagParam param = new TagParam();
-            param.type = paramMatcher.group(1);
-            param.name = paramMatcher.group(2);
-            param.optional = paramMatcher.group(3).length()>0;
-            param.description = paramMatcher.group(4);
-            method.params.add(param);
-        }
-        if (returnMatcher.find()){
-            method.returnType = returnMatcher.group(1);
-            method.returnDescription = returnMatcher.group(2);
-        }
-        methods.add(method);
-    }
-
-    private void processComment(String content, String extraLine){
-        System.out.println(content);    
-        System.out.println(extraLine);         
-//        if(classSigature.matcher(content).find()){
-//            processClass(content);
-//        }else if(cfgSigature.matcher(content).find()){
-//            processCfg(content);
-//        }else if(eventSigature.matcher(content).find()){
-//            processEvent(content);
-//        }else if(propertySigature.matcher(content).find()){
-//            processProperty(content, extraLine);
-//        }else{
-//            processMethod(content, extraLine);
-//        }
-    }
 
     private enum State {CODE, COMMENT}
     private enum ExtraState {SKIP, SPACE, READ}   
@@ -202,16 +153,29 @@ public class FileProcessor{
     private static final String START_COMMENT = "/**";
     private static final String END_COMMENT = "*/";
 
+    /**
+     * Checks if StringBuilder ends with string
+     */
     private boolean endsWith(StringBuilder sb, String str){
         int len = sb.length();
         int strLen = str.length();        
         return (len>=strLen && sb.substring(len-strLen).equals(str));
     }
 
+    /**
+     * Checks if char is white space in terms of extra line of code after
+     * comments
+     * @param ch character
+     * @return true if space or new line or * or / or ' etc...
+     */
     private boolean isWhite(char ch){
         return !Character.isLetterOrDigit(ch);
     }
 
+    /**
+     * Processes one file with state machine
+     * @param fileName Source Code file name
+     */
     private void processFile(String fileName){
         try {
             File file = new File(fileName);
@@ -247,7 +211,11 @@ public class FileProcessor{
                                 break;
                         }                                            
                         if (endsWith(buffer, START_COMMENT)){
-                            processComment(comment, extraBuffer.toString());
+                            if (comment!=null){
+                                // comment is null before the first comment starts
+                                // so we do not process it
+                                processComment(comment, extraBuffer.toString());
+                            }
                             extraBuffer.setLength(0);
                             buffer.setLength(0);
                             state = State.COMMENT;
