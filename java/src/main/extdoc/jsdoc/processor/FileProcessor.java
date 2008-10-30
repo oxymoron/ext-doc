@@ -3,6 +3,7 @@ package extdoc.jsdoc.processor;
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.schema.Doc;
 import extdoc.jsdoc.schema.Source;
+import extdoc.jsdoc.tags.Comment;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -37,115 +38,11 @@ public class FileProcessor{
     private String className;
     private String currFile;
 
-    private void parseCommentComponent(String content, 
-                                       String tagName, int from, int upto) {
-        String tx = upto <= from ? "": content.substring(from, upto);
-        System.out.println(tx);        
+
+    private void processComment(String content, String extraLine){
+        Comment comment = new Comment(content);
+        System.out.println(comment.getDescription());
     }
-
-    private enum CommentState {SPACE, DESCRIPTION}
-    private enum InnerState {TAG_NAME, TAG_GAP, IN_TEXT}
-
-    private boolean isStarWhite(char ch){
-        return Character.isWhitespace(ch) || ch=='*';
-    }
-
-    /**
-     * Processes inner comment text
-     * Very similar to Sun's com.sun.tools.javadoc#Comment
-     * @param content comment text
-     * @param extraLine one more "word" after comment (usually name)
-     */
-    private void processComment(String content, String extraLine) {
-        CommentState state = CommentState.SPACE;
-        StringBuilder buffer = new StringBuilder();
-        StringBuilder spaceBuffer = new StringBuilder();
-        boolean foundStar = false;
-        for (int i=0;i<content.length();i++){
-            char ch = content.charAt(i);
-            switch (state){
-                case SPACE:
-                    if (isStarWhite(ch)){
-                        if (ch == '*'){
-                            foundStar = true;
-                        }
-                        spaceBuffer.append(ch);
-                        break;
-                    }
-                    if (!foundStar){
-                        buffer.append(spaceBuffer);
-                    }
-                    spaceBuffer.setLength(0);
-                    state = CommentState.DESCRIPTION;
-                    /* fall through */
-                case DESCRIPTION:
-                    if (ch == '\n'){
-                        foundStar = false;
-                        state = CommentState.SPACE;
-                    }
-                    buffer.append(ch);
-                    break;
-            }
-        }
-
-        InnerState instate = InnerState.TAG_GAP;
-        String inner = buffer.toString();
-
-        String tagName = null;
-        int tagStart =0;
-        int textStart =0;
-        boolean newLine = true;
-        int lastNonWhite = -1;
-        int len = inner.length();
-        for(int i=0;i<len;i++){
-            char ch = inner.charAt(i);
-            boolean isWhite = Character.isWhitespace(ch);
-            switch (instate){
-                case TAG_NAME:
-                    if (isWhite){
-                        tagName = inner.substring(tagStart, i);
-                        instate = InnerState.TAG_GAP;
-                    }
-                    break;
-                case TAG_GAP:
-                    if (isWhite){
-                        break;
-                    }
-                    textStart = i;
-                    instate = InnerState.IN_TEXT;
-                    /* fall through */
-                case IN_TEXT:
-                    if (newLine && ch == '@'){
-                        parseCommentComponent(inner, tagName, textStart,
-                                lastNonWhite+1);
-                        tagStart = i;
-                        instate = InnerState.TAG_NAME;
-                    }
-                    break;
-            }
-            if (ch == '\n'){
-                newLine = true;
-            }else if(!isWhite){
-                lastNonWhite = i;
-                newLine = false;
-            }
-        }
-        // Finish for last item
-        switch(instate){
-            case TAG_NAME:
-                tagName = inner.substring(tagStart, len);
-                /* fall through */
-            case TAG_GAP:
-                textStart = len;
-            case IN_TEXT:
-                parseCommentComponent(inner, tagName, textStart,
-                        lastNonWhite+1);
-                break;
-        }
-        
-    }
-
-
 
     private enum State {CODE, COMMENT}
     private enum ExtraState {SKIP, SPACE, READ}   
