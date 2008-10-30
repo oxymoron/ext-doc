@@ -40,8 +40,8 @@ public class FileProcessor{
 
 
     private void processComment(String content, String extraLine){
-        Comment comment = new Comment(content);
-        System.out.println(comment.getDescription());
+        Comment comment = new Comment(content);        
+        
     }
 
     private enum State {CODE, COMMENT}

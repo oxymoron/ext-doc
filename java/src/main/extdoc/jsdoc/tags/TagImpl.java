@@ -5,7 +5,7 @@ package extdoc.jsdoc.tags;
  * Date: 30.10.2008
  * Time: 23:33:11
  */
-public class TagImpl implements Tag{
+class TagImpl implements Tag{
 
     private String name;
 
@@ -23,4 +23,22 @@ public class TagImpl implements Tag{
     public String text() {
         return text;
     }
+
+    String[] divideAtWhite(String text, int parts) {
+        String[] str = new String[parts];
+        int c = 0;
+        int start = 0;
+        char ch;
+        for(int i=0;i<text.length();i++){
+            ch = text.charAt(i);
+            if (c < parts-1 && Character.isWhitespace(ch)){
+                str[c] = text.substring(start, i);
+                start = i+1;
+                c++;
+            }
+        }
+        str[parts-1] = text.substring(start, text.length());
+        return str;
+    }
+
 }

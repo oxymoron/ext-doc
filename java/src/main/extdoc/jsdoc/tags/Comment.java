@@ -15,6 +15,24 @@ public class Comment {
 
     private String description;
 
+    public String getDescription() {
+        return description;
+    }
+
+    public Tag[] tags(){
+        return tagList.toArray(new Tag[tagList.size()]);
+    }
+
+    public Tag[] tags(String tagName){
+        List<Tag> found = new ArrayList<Tag>();
+        for(Tag tag : tagList){
+            if (tag.name().equals(tagName)){
+                found.add(tag);
+            }
+        }
+        return found.toArray(new Tag[found.size()]);
+    }
+
     private enum CommentState {SPACE, DESCRIPTION}
     private enum InnerState {TAG_NAME, TAG_GAP, IN_TEXT}
 
@@ -127,9 +145,15 @@ public class Comment {
                 String tx = upto <= from ? "": content.substring(from, upto);
                 if (tagName == null){
                     description = tx;
+                }else{
+                    TagImpl tag;
+                    if (tagName.equals("@class")){
+                        tag = new ClassTagImpl(tagName, tx);
+                    }else{
+                        tag = new TagImpl(tagName, tx);
+                    }
+                    tagList.add(tag);
                 }
-                TagImpl tag = new TagImpl(tagName, tx);
-                 tagList.add(tag);
             }
             
         }
@@ -137,7 +161,4 @@ public class Comment {
 
     }
 
-    public String getDescription() {
-        return description;
-    }
 }
