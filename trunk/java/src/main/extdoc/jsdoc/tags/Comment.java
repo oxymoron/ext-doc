@@ -159,6 +159,10 @@ public class Comment {
                         tag = new TypeTagImpl(tagName, tx);
                     }else if (tagName.equals("@return")){
                         tag = new ReturnTagImpl(tagName, tx);
+                    }else if (tagName.equals("@member")){
+                        tag = new MemberTagImpl(tagName, tx);
+                    }else if (tagName.equals("@event")){
+                        tag = new EventTagImpl(tagName, tx);
                     }else{
                         tag = new TagImpl(tagName, tx);
                     }
