@@ -1,11 +1,13 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.CfgTag;
 
 /**
  * User: Andrey Zubkov
  * Date: 01.11.2008
  * Time: 1:58:03
  */
-public class CfgTagImpl extends TagImpl{
+class CfgTagImpl extends TagImpl implements CfgTag {
 
     private String cfgName;
 

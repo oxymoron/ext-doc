@@ -1,7 +1,5 @@
 package extdoc.jsdoc.docs;
 
-import extdoc.jsdoc.tags.TagParam;
-
 import java.util.ArrayList;
 import java.util.List;
 

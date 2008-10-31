@@ -1,11 +1,13 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.ParamTag;
 
 /**
  * User: Andrey Zubkov
  * Date: 31.10.2008
  * Time: 1:04:07
  */
-public class ParamTagImpl extends TagImpl{
+class ParamTagImpl extends TagImpl implements ParamTag {
 
     private String paramType;
     private String paramName;

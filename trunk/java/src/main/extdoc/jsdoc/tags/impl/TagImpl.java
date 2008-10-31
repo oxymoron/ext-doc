@@ -1,11 +1,13 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.Tag;
 
 /**
  * User: Andrey Zubkov
  * Date: 30.10.2008
  * Time: 23:33:11
  */
-class TagImpl implements Tag{
+class TagImpl implements Tag {
 
     private String name;
 
