@@ -15,12 +15,15 @@ class CfgTagImpl extends TagImpl implements CfgTag {
 
     private String cfgDescription;
 
+    private boolean optional;
+
     public CfgTagImpl(String name, String text) {
         super(name, text);
         String[] str = divideAtWhite(text, 3);
         cfgType = removeBrackets(str[0]);
         cfgName = str[1];
-        cfgDescription =str[2];
+        optional = isOptional(str[2]);
+        cfgDescription = optional?cutOptional(str[2]):str[2];
 
     }
 
@@ -34,5 +37,9 @@ class CfgTagImpl extends TagImpl implements CfgTag {
 
     public String getCfgDescription() {
         return cfgDescription;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 }
