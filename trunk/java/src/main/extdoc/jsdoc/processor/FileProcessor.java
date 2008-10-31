@@ -3,7 +3,7 @@ package extdoc.jsdoc.processor;
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.schema.Doc;
 import extdoc.jsdoc.schema.Source;
-import extdoc.jsdoc.tags.CfgTag;
+import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
 import org.w3c.dom.Document;
 
@@ -43,17 +43,49 @@ public class FileProcessor{
     private void processComment(String content, String extraLine){
         Comment comment = new Comment(content);
 
+        // CFG
         if(comment.hasTag("@cfg")){
             DocCfg cfg = new DocCfg();
-            List<CfgTag> tag = comment.tags("@cfg");
-            cfg.description = comment.getDescription();
+            CfgTag tag = comment.tag("@cfg");
+            cfg.name = tag.getCfgName();
+            cfg.type = tag.getCfgType();
+            cfg.description = tag.getCfgDescription();
+            cfg.optional = tag.isOptional();
             cfgs.add(cfg);
+
+        // EVENT
         }else if(comment.hasTag("@event")){
             System.out.println("event");
+
+        // CLASS
         }else if(comment.hasTag("@class")){
-            System.out.println("class");
+            DocClass cls = new DocClass();
+
+            ClassTag classTag = comment.tag("@class");
+            Tag singletonTag = comment.tag("@singleton");
+            ExtendsTag extendsTag = comment.tag("@extends");
+            Tag constructorTag = comment.tag("@constructor");
+            List<ParamTag> paramTags = comment.tags("@param");
+
+            cls.className = classTag.getClassName();
+            cls.definedIn = currFile;
+            cls.singleton = singletonTag!=null;
+            String description = classTag.getClassDescription();
+            if (description==null){
+                description = extendsTag.getClassDescription();
+            }
+            cls.description = description;
+            cls.parentClass = extendsTag.getClassName();
+
+            classes.add(cls);
+
+            className = cls.className;
+
+        // PROPERTY
         }else if(comment.hasTag("@type")){
             System.out.println("property");
+
+        // METHOD
         }else{
             System.out.println("method");            
         }

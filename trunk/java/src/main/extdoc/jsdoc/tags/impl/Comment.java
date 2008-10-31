@@ -21,9 +21,12 @@ public class Comment {
         return description;
     }
 
-//    public Tag[] tags(){
-//        return tagList.toArray(new Tag[tagList.size()]);
-//    }
+    public <T extends Tag>  T tag(String tagName){
+        for(Tag tag: tagList){
+            if (tag.name().equals(tagName)) return (T)tag;
+        }
+        return null;
+    }
 
     public <T extends Tag> List<T> tags(String tagName){
         List<T> found = new ArrayList<T>();

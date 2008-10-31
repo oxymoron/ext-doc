@@ -11,4 +11,7 @@ public interface CfgTag extends Tag{
     String getCfgType();
 
     String getCfgDescription();
+
+     public boolean isOptional();
+    
 }
