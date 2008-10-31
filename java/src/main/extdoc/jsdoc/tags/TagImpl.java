@@ -37,11 +37,12 @@ class TagImpl implements Tag{
                 c++;
             }
         }
-        str[parts-1] = text.substring(start, text.length());
+        str[c] = text.substring(start, text.length());
         return str;
     }
 
     String removeBrackets(String text){
+        if (text==null) return text;
         int len = text.length();
         int start = text.charAt(0)=='{'?1:0;
         int end = text.charAt(len-1)=='}'?len-1:len;
@@ -53,14 +54,14 @@ class TagImpl implements Tag{
     private static final int OPTIONAL_LEN = OPTIONAL_U.length();
 
     boolean isOptional(String text){        
-        return (text.startsWith(OPTIONAL_U)
-                || text.startsWith(OPTIONAL_L));
+        return text!=null && ((text.startsWith(OPTIONAL_U)
+                || text.startsWith(OPTIONAL_L)));
     }
 
     String cutOptional(String text){
         String str = text;
         if (isOptional(text)){
-            str = text.substring(OPTIONAL_LEN+1);            
+            str = text.length()>OPTIONAL_LEN+1?text.substring(OPTIONAL_LEN+1):"";            
         }
         return str;
     }
