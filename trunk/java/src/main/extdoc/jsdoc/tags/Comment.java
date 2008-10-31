@@ -150,7 +150,15 @@ public class Comment {
                     if (tagName.equals("@class")){
                         tag = new ClassTagImpl(tagName, tx);
                     }else if (tagName.equals("@param")){
-                        tag = new ParamTagImpl(tagName, tx);                        
+                        tag = new ParamTagImpl(tagName, tx);
+                    }else if (tagName.equals("@extends")){
+                        tag = new ExtendsTagImpl(tagName, tx);
+                    }else if (tagName.equals("@cfg")){
+                        tag = new CfgTagImpl(tagName, tx);
+                    }else if (tagName.equals("@type")){
+                        tag = new TypeTagImpl(tagName, tx);
+                    }else if (tagName.equals("@return")){
+                        tag = new ReturnTagImpl(tagName, tx);
                     }else{
                         tag = new TagImpl(tagName, tx);
                     }
