@@ -1,11 +1,13 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.ReturnTag;
 
 /**
  * User: Andrey Zubkov
  * Date: 01.11.2008
  * Time: 2:16:53
  */
-public class ReturnTagImpl extends TagImpl{
+class ReturnTagImpl extends TagImpl implements ReturnTag {
 
     private String returnType;
 

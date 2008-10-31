@@ -1,4 +1,6 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,21 +21,29 @@ public class Comment {
         return description;
     }
 
-    public Tag[] tags(){
-        return tagList.toArray(new Tag[tagList.size()]);
-    }
+//    public Tag[] tags(){
+//        return tagList.toArray(new Tag[tagList.size()]);
+//    }
 
-    public Tag[] tags(String tagName){
-        List<Tag> found = new ArrayList<Tag>();
+    public <T extends Tag> List<T> tags(String tagName){
+        List<T> found = new ArrayList<T>();
         for(Tag tag : tagList){
             if (tag.name().equals(tagName)){
-                found.add(tag);
+                found.add((T) tag);
             }
         }
-        return found.toArray(new Tag[found.size()]);
+        return found;
+    }
+
+    public boolean hasTag(String tagName){
+        for(Tag tag: tagList){
+            if (tag.name().equals(tagName)) return true;
+        }
+        return false;
     }
 
     private enum CommentState {SPACE, DESCRIPTION}
+
     private enum InnerState {TAG_NAME, TAG_GAP, IN_TEXT}
 
     /**

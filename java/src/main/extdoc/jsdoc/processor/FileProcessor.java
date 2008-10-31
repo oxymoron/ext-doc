@@ -3,7 +3,8 @@ package extdoc.jsdoc.processor;
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.schema.Doc;
 import extdoc.jsdoc.schema.Source;
-import extdoc.jsdoc.tags.Comment;
+import extdoc.jsdoc.tags.CfgTag;
+import extdoc.jsdoc.tags.impl.Comment;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -40,7 +41,22 @@ public class FileProcessor{
 
 
     private void processComment(String content, String extraLine){
-        Comment comment = new Comment(content);        
+        Comment comment = new Comment(content);
+
+        if(comment.hasTag("@cfg")){
+            DocCfg cfg = new DocCfg();
+            List<CfgTag> tag = comment.tags("@cfg");
+            cfg.description = comment.getDescription();
+            cfgs.add(cfg);
+        }else if(comment.hasTag("@event")){
+            System.out.println("event");
+        }else if(comment.hasTag("@class")){
+            System.out.println("class");
+        }else if(comment.hasTag("@type")){
+            System.out.println("property");
+        }else{
+            System.out.println("method");            
+        }
         
     }
 

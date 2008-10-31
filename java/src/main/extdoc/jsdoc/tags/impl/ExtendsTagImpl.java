@@ -1,17 +1,19 @@
-package extdoc.jsdoc.tags;
+package extdoc.jsdoc.tags.impl;
+
+import extdoc.jsdoc.tags.ExtendsTag;
 
 /**
  * User: Andrey Zubkov
- * Date: 31.10.2008
- * Time: 0:08:37
+ * Date: 01.11.2008
+ * Time: 1:54:12
  */
-public class ClassTagImpl extends TagImpl{
-
+class ExtendsTagImpl extends TagImpl implements ExtendsTag {
+    
     String className;
 
     String classDescription;
 
-    public ClassTagImpl(String name, String text) {
+    public ExtendsTagImpl(String name, String text) {
         super(name, text);
         String[] str = divideAtWhite(text, 2);
         className = str[0];
