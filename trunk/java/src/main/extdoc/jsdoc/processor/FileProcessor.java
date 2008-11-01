@@ -353,7 +353,7 @@ public class FileProcessor{
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
             }
             fileInputStream.close();
-//            populateTree();
+            populateTree();
             createTree();
         } catch (JAXBException e) {
             e.printStackTrace();
