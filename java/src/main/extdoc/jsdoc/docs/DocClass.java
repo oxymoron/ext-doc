@@ -13,6 +13,8 @@ import java.util.List;
 @XmlRootElement
 public class DocClass{
     public String className;
+    public String shortClassName;
+    public String packageName;
     public String definedIn;
     public boolean singleton;
     public String description;
