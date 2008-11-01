@@ -5,6 +5,7 @@ import extdoc.jsdoc.schema.Doc;
 import extdoc.jsdoc.schema.Source;
 import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
+import extdoc.jsdoc.tree.TreePackage;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -34,6 +35,8 @@ public class FileProcessor{
     public List<DocProperty> properties = new ArrayList<DocProperty>();
     public List<DocMethod> methods = new ArrayList<DocMethod>();
     public List<DocEvent> events = new ArrayList<DocEvent>();
+
+    private TreePackage tree = new TreePackage("API");
 
     final static String OUT_FILE_EXTENSION = "html";
     private String className;
@@ -331,6 +334,12 @@ public class FileProcessor{
         }
     }
 
+    private void createTree(){
+        for(DocClass cls: classes){            
+            tree.addClass(cls);
+        }
+    }
+
     public void process(String fileName){
         try {
             File xmlFile = new File(fileName);
@@ -344,7 +353,8 @@ public class FileProcessor{
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
             }
             fileInputStream.close();
-            populateTree();
+//            populateTree();
+            createTree();
         } catch (JAXBException e) {
             e.printStackTrace();
         } catch (IOException e) {
