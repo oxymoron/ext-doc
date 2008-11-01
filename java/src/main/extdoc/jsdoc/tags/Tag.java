@@ -7,4 +7,5 @@ package extdoc.jsdoc.tags;
  */
 public interface Tag {
     String name();
+    String text();
 }
