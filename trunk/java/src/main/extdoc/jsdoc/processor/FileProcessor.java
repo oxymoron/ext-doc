@@ -57,6 +57,16 @@ public class FileProcessor{
         }
     }
 
+    private String[] dividePackage(String className){
+        String[] str = new String[2];
+        int len = className.length();
+        int i = len-1;
+        while(i>=0 && className.charAt(i)!='.') i--;
+        str[0] = (i>0)?className.substring(0,i):"";
+        str[1] = className.substring(i+1,len);
+        return str;
+    }
+
     /**
      * Process class 
      * @param comment Comment
@@ -71,6 +81,9 @@ public class FileProcessor{
         List<ParamTag> paramTags = comment.tags("@param");
 
         cls.className = classTag.getClassName();
+        String[] str = dividePackage(cls.className);
+        cls.packageName = str[0];
+        cls.shortClassName = str[1];
         cls.definedIn = currFile;
         cls.singleton = singletonTag!=null;
         String description = classTag.getClassDescription();
@@ -183,12 +196,12 @@ public class FileProcessor{
      */
     private void processComment(String content, String extraLine){
         Comment comment = new Comment(content);
-        if(comment.hasTag("@cfg")){
-            processCfg(comment);
+        if(comment.hasTag("@class")){
+            processClass(comment);
         }else if(comment.hasTag("@event")){
             processEvent(comment);
-        }else if(comment.hasTag("@class")){
-            processClass(comment);
+        }else if(comment.hasTag("@cfg")){
+            processCfg(comment);
         }else if(comment.hasTag("@type")){
             processProperty(comment, extraLine);        
         }else{
