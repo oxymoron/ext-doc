@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<doc version="0.9">
+<doc>
 	<source>
 		<file src="ext/source/core/Ext.js"/>
 		<file src="ext/source/widgets/Component.js"/>
