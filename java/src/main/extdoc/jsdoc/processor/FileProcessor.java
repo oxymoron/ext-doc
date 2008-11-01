@@ -1,22 +1,20 @@
 package extdoc.jsdoc.processor;
 
 import extdoc.jsdoc.docs.*;
-import extdoc.jsdoc.schema.Doc;
-import extdoc.jsdoc.schema.Source;
 import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
+import extdoc.jsdoc.tplschema.*;
 import extdoc.jsdoc.tree.TreePackage;
-import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
@@ -32,7 +30,8 @@ public class FileProcessor{
 
     public List<DocClass> classes = new ArrayList<DocClass>();
     public List<DocCfg> cfgs = new ArrayList<DocCfg>();
-    public List<DocProperty> properties = new ArrayList<DocProperty>();
+    public List<DocProperty> properties =
+            new ArrayList<DocProperty>();
     public List<DocMethod> methods = new ArrayList<DocMethod>();
     public List<DocEvent> events = new ArrayList<DocEvent>();
 
@@ -246,7 +245,8 @@ public class FileProcessor{
         try {
             File file = new File(fileName);
             currFile = file.getName();
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader =
+                    new BufferedReader(new FileReader(file));
             int numRead;
             State state = State.CODE;
             ExtraState extraState = ExtraState.SKIP;            
@@ -289,7 +289,9 @@ public class FileProcessor{
                         break;
                     case COMMENT:
                        if (endsWith(buffer, END_COMMENT)){
-                            comment = buffer.substring(0, buffer.length()-END_COMMENT.length());
+                            comment =
+                                    buffer.substring(0,
+                                            buffer.length()-END_COMMENT.length());
                             buffer.setLength(0);
                             state = State.CODE;
                             extraState = ExtraState.SPACE;
@@ -344,10 +346,13 @@ public class FileProcessor{
         try {
             File xmlFile = new File(fileName);
             FileInputStream fileInputStream = new FileInputStream(xmlFile);
-            JAXBContext jaxbContext = JAXBContext.newInstance("extdoc.jsdoc.schema");
+            JAXBContext jaxbContext =
+                    JAXBContext.newInstance("extdoc.jsdoc.schema");
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Doc doc = (Doc) unmarshaller.unmarshal(fileInputStream);
-            Source source = doc.getSource();
+            extdoc.jsdoc.schema.Doc doc =
+                    (extdoc.jsdoc.schema.Doc) unmarshaller.
+                            unmarshal(fileInputStream);
+            extdoc.jsdoc.schema.Source source = doc.getSource();
             List<extdoc.jsdoc.schema.File> files = source.getFile();
             for(extdoc.jsdoc.schema.File file: files){
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
@@ -369,9 +374,79 @@ public class FileProcessor{
        file.mkdirs();
     }
 
-    public void saveToFolder(String folderName, String templateFileName) {
+
+
+     private void copyDirectory(File sourceLocation , File targetLocation)
+        throws IOException {
+
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+
+            String[] children = sourceLocation.list();
+            for (String child : children) {
+                copyDirectory(new File(sourceLocation, child),
+                        new File(targetLocation, child));
+            }
+        } else {
+
+            InputStream in = new FileInputStream(sourceLocation);
+            OutputStream out = new FileOutputStream(targetLocation);
+
+            // Copy the bits from instream to outstream
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+    }
+
+    public void saveToFolder(String folderName, String templateFileName){
         createResources(folderName);
         try {
+
+            File templateFile = new File(templateFileName);
+            String templateFolder = templateFile.getParent();
+
+            // Read template.xml
+            JAXBContext jaxbTplContext =
+                    JAXBContext.newInstance("extdoc.jsdoc.tplschema");
+            Unmarshaller unmarshaller = jaxbTplContext.createUnmarshaller();
+            Template template = (Template) unmarshaller.
+                        unmarshal(new FileInputStream(templateFile));
+            ClassTemplate classTemplate = template.getClassTemplate();
+            String classTplFileName = new StringBuilder()
+                    .append(templateFolder)
+                    .append(File.separator)
+                    .append(classTemplate.getTpl())
+                    .toString();
+            String classTplTargetDir = classTemplate.getTargetDir();
+            TreeTemplate treeTemplate = template.getTreeTemplate();
+            String treeTplFileName = treeTemplate.getTpl();
+            String treeTplTargetFile = treeTemplate.getTargetFile();
+
+            Resources resources = template.getResources();
+
+            List<Copy> dirs = resources.getCopy();
+
+            for(Copy dir : dirs){
+                String src = new StringBuilder()
+                    .append(templateFolder)
+                    .append(File.separator)
+                    .append(dir.getSrc())
+                    .toString();
+                String dst = new StringBuilder()
+                    .append(folderName)
+                    .append(File.separator)
+                    .append(dir.getDst())
+                    .toString();
+                copyDirectory(new File(src), new File(dst));
+            }
+
             JAXBContext jaxbContext = JAXBContext.newInstance("extdoc.jsdoc.docs");
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -380,22 +455,24 @@ public class FileProcessor{
             builderFactory.setNamespaceAware(true);
 
             TransformerFactory factory = TransformerFactory.newInstance();
-            Templates transformation = factory.newTemplates (new StreamSource(templateFileName)) ;
+            Templates transformation = factory.newTemplates (new StreamSource(classTplFileName)) ;
             Transformer transformer = transformation.newTransformer();
-
-            for(DocClass docClass: classes){
-                String targetFileName = folderName+File.separator+docClass.className+".html";
-                Document doc = builderFactory.newDocumentBuilder().newDocument();
-                marshaller.marshal(docClass, doc);
-                marshaller.marshal(docClass, new File(targetFileName+"_"));
-                Result fileResult = new StreamResult(new File(targetFileName));
-                transformer.transform(new DOMSource(doc), fileResult);
-            }
+//
+//            for(DocClass docClass: classes){
+//                String targetFileName = folderName+File.separator+docClass.className+".html";
+//                Document doc = builderFactory.newDocumentBuilder().newDocument();
+//                marshaller.marshal(docClass, doc);
+//                marshaller.marshal(docClass, new File(targetFileName+"_"));
+//                Result fileResult = new StreamResult(new File(targetFileName));
+//                transformer.transform(new DOMSource(doc), fileResult);
+//            }
         } catch (JAXBException e) {
             e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+//        } catch (ParserConfigurationException e) {
+//            e.printStackTrace();
         } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
