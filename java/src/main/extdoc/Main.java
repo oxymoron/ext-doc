@@ -15,6 +15,6 @@ public class Main {
         String templateFileName = args[2];
         FileProcessor processor = new FileProcessor();
         processor.process(xmlFileName);
-//        processor.saveToFolder(outputFolderName, templateFileName);
+        processor.saveToFolder(outputFolderName, templateFileName);
     }
 }
