@@ -11,11 +11,13 @@
         <delete dir="bin"/>
         <delete dir="build"/>
         <delete dir="java/src/main/extdoc/jsdoc/schema"/>
+        <delete dir="java/src/main/extdoc/jsdoc/tplschema"/>
     </target>
 
     <target name="compile">
         <mkdir dir="bin"/>
         <xjc schema="schema/ext-doc.xsd" destdir="java/src/main" package="extdoc.jsdoc.schema"/>
+        <xjc schema="schema/template.xsd" destdir="java/src/main" package="extdoc.jsdoc.tplschema"/>
         <javac srcdir="java/src/main" destdir="bin"/>        
     </target>
                                                                                 

@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 rel. 3 (http://www.altova.com) by oxymoron (EMBRACE) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="source">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="file" maxOccurs="unbounded"/>
+				<xs:element ref="file" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="file">
 		<xs:complexType>
-			<xs:attribute name="src" use="required">
-				<xs:simpleType>
-					<xs:restriction base="xs:string"/>
-				</xs:simpleType>
-			</xs:attribute>
+			<xs:attribute name="src" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="doc">
