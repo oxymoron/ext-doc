@@ -39,6 +39,28 @@ public class FileProcessor{
     private String className;
     private String currFile;
 
+    /**
+     *  Read params from list of param tags and add them to list of params
+     *  Just simplifies param processing for class, method and event
+     * @param paramTags tags
+     * @param  params target list of params
+     */
+    private void readParams(List<ParamTag> paramTags,
+                                                        List<Param> params){
+        for(ParamTag paramTag: paramTags){
+            Param param = new Param();
+            param.name = paramTag.getParamName();
+            param.type = paramTag.getParamType();
+            param.description = paramTag.getParamDescription();
+            param.optional = paramTag.isOptional();
+            params.add(param);
+        }
+    }
+
+    /**
+     * Process class 
+     * @param comment Comment
+     */
     private void processClass(Comment comment){
         DocClass cls = new DocClass();
         
@@ -61,19 +83,16 @@ public class FileProcessor{
         cls.hasConstructor = constructorTag!=null;
         if (constructorTag!=null){
             cls.constructorDescription = constructorTag.text();
-            for(ParamTag paramTag: paramTags){
-                Param param = new Param();
-                param.name = paramTag.getParamName();
-                param.type = paramTag.getParamType();
-                param.description = paramTag.getParamDescription();
-                param.optional = paramTag.isOptional();
-                cls.params.add(param);
-            }
+            readParams(paramTags, cls.params);
         }
         classes.add(cls);
         className = cls.className;
     }
 
+    /**
+     * Process cfg
+     * @param comment Comment
+     */
     private void processCfg(Comment comment){
         DocCfg cfg = new DocCfg();
         CfgTag tag = comment.tag("@cfg");
@@ -85,6 +104,11 @@ public class FileProcessor{
         cfgs.add(cfg);
     }
 
+    /**
+     * Process property 
+     * @param comment Comment
+     * @param extraLine first word form the line after comment
+     */
     private void processProperty(Comment comment,String extraLine){
         DocProperty property = new DocProperty();
 
@@ -100,27 +124,63 @@ public class FileProcessor{
         property.type = typeTag.getType();
         property.description = comment.getDescription();
         property.className = className;        
-        properties.add(property);
+        properties.add(property);        
     }
 
+    /**
+     * Process method 
+     * @param comment Comment
+     * @param extraLine first word form the line after comment
+     */
+    private void processMethod(Comment comment, String extraLine){
+        DocMethod method = new DocMethod();
+
+        Tag methodTag = comment.tag("@method");
+        Tag staticTag = comment.tag("@static");
+        List<ParamTag> paramTags = comment.tags("@param");
+        ReturnTag returnTag = comment.tag("@return");
+        MemberTag memberTag = comment.tag("@member");
+
+        // should be first because @member may redefine class
+        method.className = className;
+        method.name = extraLine;
+        if (methodTag!=null){
+            method.name = methodTag.text();
+        }
+        if (memberTag!=null){
+            method.name = memberTag.getMethodName();
+            method.className = memberTag.getClassName();
+        }
+        method.isStatic = (staticTag!=null);
+        method.description = comment.getDescription();
+        if (returnTag!=null){
+            method.returnType =returnTag.getReturnType();
+            method.returnDescription =returnTag.getReturnDescription();
+        }
+        readParams(paramTags, method.params);
+        methods.add(method);
+    }
+
+    /**
+     * Process event
+     * @param comment Comment
+     */
     private void processEvent(Comment comment){
         DocEvent event = new DocEvent();
         EventTag eventTag = comment.tag("@event");
         List<ParamTag> paramTags = comment.tags("@param");
         event.name = eventTag.getEventName();
         event.description = eventTag.getEventDescription();
-        for(ParamTag paramTag: paramTags){
-                Param param = new Param();
-                param.name = paramTag.getParamName();
-                param.type = paramTag.getParamType();
-                param.description = paramTag.getParamDescription();
-                param.optional = paramTag.isOptional();
-                event.params.add(param);
-        }
+        readParams(paramTags, event.params);
         event.className = className;
         events.add(event);
     }
 
+    /**
+     *  Determine type of comment and process it
+     * @param content text inside / ** and * /
+     * @param extraLine first word form the line after comment 
+     */
     private void processComment(String content, String extraLine){
         Comment comment = new Comment(content);
         if(comment.hasTag("@cfg")){
@@ -132,7 +192,7 @@ public class FileProcessor{
         }else if(comment.hasTag("@type")){
             processProperty(comment, extraLine);        
         }else{
-            System.out.println("method");            
+            processMethod(comment, extraLine);            
         }
         
     }
