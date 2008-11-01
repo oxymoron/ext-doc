@@ -11,12 +11,11 @@ public class TreeClass {
     
     private DocClass docClass;
 
-    public TreeClass(DocClass docClass) {
-        this.docClass = docClass;
-    }
-
     public DocClass getDocClass() {
         return docClass;
     }
 
+    public void setDocClass(DocClass docClass) {
+        this.docClass = docClass;
+    }
 }
