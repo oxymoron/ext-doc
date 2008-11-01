@@ -2,6 +2,7 @@ package extdoc.jsdoc.tree;
 
 import extdoc.jsdoc.docs.DocClass;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,27 +11,16 @@ import java.util.List;
  * Date: 01.11.2008
  * Time: 16:48:21
  */
+@XmlRootElement
 public class TreePackage {
 
     private String name;
 
-    public TreePackage(String name) {
-        this.name = name;
-    }
-
-    protected List<TreeClass> classes =
+    public List<TreeClass> classes =
             new ArrayList<TreeClass>();
 
-    private List<TreePackage> packages =
+    public List<TreePackage> packages =
             new ArrayList<TreePackage>();
-
-    public List<TreeClass> getClasses() {
-        return classes;
-    }
-
-    public List<TreePackage> getPackages() {
-        return packages;
-    }
 
     public void addClass(DocClass docClass){
         addClass(docClass.packageName, docClass);
@@ -38,7 +28,9 @@ public class TreePackage {
 
     public void addClass(String packageName, DocClass docClass){        
         if (packageName.equals("")){
-            classes.add(new TreeClass(docClass));
+            TreeClass treeClass = new TreeClass();
+            treeClass.setDocClass(docClass);
+            classes.add(treeClass);
         }else{
             int i=0;
             int len = packageName.length();
@@ -53,18 +45,24 @@ public class TreePackage {
     }
 
     /**
-     * Returns existing or creates new package if not exists 
+     * Returns existing or creates new package if not exists
+     * @return returns new or existing package
      */
     protected TreePackage addPackage(String packageName){
         for(TreePackage p: packages){
             if (p.getName().equals(packageName)) return p;
         }
-        TreePackage p = new TreePackage(packageName);
+        TreePackage p = new TreePackage();
+        p.setName(packageName);
         packages.add(p);
         return p;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
