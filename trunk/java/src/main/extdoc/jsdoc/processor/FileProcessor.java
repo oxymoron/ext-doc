@@ -39,53 +39,98 @@ public class FileProcessor{
     private String className;
     private String currFile;
 
+    private void processClass(Comment comment){
+        DocClass cls = new DocClass();
+        
+        ClassTag classTag = comment.tag("@class");
+        Tag singletonTag = comment.tag("@singleton");
+        ExtendsTag extendsTag = comment.tag("@extends");
+        Tag constructorTag = comment.tag("@constructor");
+        List<ParamTag> paramTags = comment.tags("@param");
+
+        cls.className = classTag.getClassName();
+        cls.definedIn = currFile;
+        cls.singleton = singletonTag!=null;
+        String description = classTag.getClassDescription();
+        if (description==null && extendsTag!=null){
+            description = extendsTag.getClassDescription();
+        }
+        cls.description = description;
+        cls.parentClass =
+                (extendsTag!=null)?extendsTag.getClassName():null;
+        cls.hasConstructor = constructorTag!=null;
+        if (constructorTag!=null){
+            cls.constructorDescription = constructorTag.text();
+            for(ParamTag paramTag: paramTags){
+                Param param = new Param();
+                param.name = paramTag.getParamName();
+                param.type = paramTag.getParamType();
+                param.description = paramTag.getParamDescription();
+                param.optional = paramTag.isOptional();
+                cls.params.add(param);
+            }
+        }
+        classes.add(cls);
+        className = cls.className;
+    }
+
+    private void processCfg(Comment comment){
+        DocCfg cfg = new DocCfg();
+        CfgTag tag = comment.tag("@cfg");
+        cfg.name = tag.getCfgName();
+        cfg.type = tag.getCfgType();
+        cfg.description = tag.getCfgDescription();
+        cfg.optional = tag.isOptional();
+        cfg.className = className;
+        cfgs.add(cfg);
+    }
+
+    private void processProperty(Comment comment,String extraLine){
+        DocProperty property = new DocProperty();
+
+        Tag propertyTag = comment.tag("@property");
+        TypeTag typeTag = comment.tag("@type");
+
+        property.name = extraLine;
+        if (propertyTag!=null
+                && propertyTag.text()!=null 
+                && propertyTag.text().length()>0){
+            property.name = propertyTag.text();
+        }
+        property.type = typeTag.getType();
+        property.description = comment.getDescription();
+        property.className = className;        
+        properties.add(property);
+    }
+
+    private void processEvent(Comment comment){
+        DocEvent event = new DocEvent();
+        EventTag eventTag = comment.tag("@event");
+        List<ParamTag> paramTags = comment.tags("@param");
+        event.name = eventTag.getEventName();
+        event.description = eventTag.getEventDescription();
+        for(ParamTag paramTag: paramTags){
+                Param param = new Param();
+                param.name = paramTag.getParamName();
+                param.type = paramTag.getParamType();
+                param.description = paramTag.getParamDescription();
+                param.optional = paramTag.isOptional();
+                event.params.add(param);
+        }
+        event.className = className;
+        events.add(event);
+    }
 
     private void processComment(String content, String extraLine){
         Comment comment = new Comment(content);
-
-        // CFG
         if(comment.hasTag("@cfg")){
-            DocCfg cfg = new DocCfg();
-            CfgTag tag = comment.tag("@cfg");
-            cfg.name = tag.getCfgName();
-            cfg.type = tag.getCfgType();
-            cfg.description = tag.getCfgDescription();
-            cfg.optional = tag.isOptional();
-            cfgs.add(cfg);
-
-        // EVENT
+            processCfg(comment);
         }else if(comment.hasTag("@event")){
-            System.out.println("event");
-
-        // CLASS
+            processEvent(comment);
         }else if(comment.hasTag("@class")){
-            DocClass cls = new DocClass();
-
-            ClassTag classTag = comment.tag("@class");
-            Tag singletonTag = comment.tag("@singleton");
-            ExtendsTag extendsTag = comment.tag("@extends");
-            Tag constructorTag = comment.tag("@constructor");
-            List<ParamTag> paramTags = comment.tags("@param");
-
-            cls.className = classTag.getClassName();
-            cls.definedIn = currFile;
-            cls.singleton = singletonTag!=null;
-            String description = classTag.getClassDescription();
-            if (description==null){
-                description = extendsTag.getClassDescription();
-            }
-            cls.description = description;
-            cls.parentClass = extendsTag.getClassName();
-
-            classes.add(cls);
-
-            className = cls.className;
-
-        // PROPERTY
+            processClass(comment);
         }else if(comment.hasTag("@type")){
-            System.out.println("property");
-
-        // METHOD
+            processProperty(comment, extraLine);        
         }else{
             System.out.println("method");            
         }

@@ -11,7 +11,7 @@ import java.util.List;
 public class DocMethod{
     public String name;
     public String description;
-    public List<TagParam> params = new ArrayList <TagParam>();
+    public List<Param> params = new ArrayList <Param>();
     public String className;
     public String returnType;
     public String returnDescription;

@@ -19,7 +19,7 @@ public class DocClass{
     public String parentClass;
     public boolean hasConstructor;
     public String constructorDescription;
-    public List<TagParam> params = new ArrayList<TagParam>();
+    public List<Param> params = new ArrayList<Param>();
     public List<DocCfg> cfgs = new ArrayList<DocCfg>();
     public List<DocProperty> properties = new ArrayList<DocProperty>();
     public List<DocMethod> methods = new ArrayList<DocMethod>();

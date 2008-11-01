@@ -11,6 +11,6 @@ import java.util.List;
 public class DocEvent{
     public String name;
     public String description;
-    public List<TagParam> params = new ArrayList<TagParam>();
+    public List<Param> params = new ArrayList<Param>();
     public String className;
 }
