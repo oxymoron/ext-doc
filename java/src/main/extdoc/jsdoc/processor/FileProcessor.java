@@ -429,6 +429,8 @@ public class FileProcessor{
             String treeTplFileName = treeTemplate.getTpl();
             String treeTplTargetFile = treeTemplate.getTargetFile();
 
+            System.out.println(classTplFileName);
+
             Resources resources = template.getResources();
 
             List<Copy> dirs = resources.getCopy();
