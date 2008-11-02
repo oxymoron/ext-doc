@@ -10,4 +10,5 @@ public class DocProperty{
     public String type;
     public String description;
     public String className;
+    public String shortClassName;
 }

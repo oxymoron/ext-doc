@@ -13,4 +13,5 @@ public class DocEvent{
     public String description;
     public List<Param> params = new ArrayList<Param>();
     public String className;
+    public String shortClassName;    
 }

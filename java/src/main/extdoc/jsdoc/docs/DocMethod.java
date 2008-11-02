@@ -16,4 +16,5 @@ public class DocMethod{
     public String returnType;
     public String returnDescription;
     public boolean isStatic;
+    public String shortClassName;    
 }
