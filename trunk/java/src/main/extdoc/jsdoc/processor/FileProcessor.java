@@ -309,7 +309,7 @@ public class FileProcessor{
         }
     }
 
-    private void populateTree(){
+    private void createClassHierarchy(){
         for(DocClass docClass: classes){
             for(DocClass cls: classes){
                 if(docClass.className.equals(cls.parentClass)){
@@ -339,7 +339,14 @@ public class FileProcessor{
         }
     }
 
-    private void createTree(){
+    private void injectInherited(List<DocClass> classList, DocClass parent){
+        for(DocClass cls: classList){
+            System.out.println(cls.className);
+            injectInherited(cls.subClasses, cls);
+        }
+    }
+
+    private void createPackageHierarchy(){
         for(DocClass cls: classes){            
             tree.addClass(cls);
         }
@@ -361,8 +368,9 @@ public class FileProcessor{
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
             }
             fileInputStream.close();
-            populateTree();
-            createTree();
+            createClassHierarchy();
+            injectInherited(classes, null);
+            createPackageHierarchy();
         } catch (JAXBException e) {
             e.printStackTrace();
         } catch (IOException e) {
