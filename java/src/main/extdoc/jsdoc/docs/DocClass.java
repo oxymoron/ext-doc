@@ -1,6 +1,7 @@
 package extdoc.jsdoc.docs;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,4 +28,6 @@ public class DocClass{
     public List<DocMethod> methods = new ArrayList<DocMethod>();
     public List<DocEvent> events = new ArrayList<DocEvent>();
     public List<DocClass> subClasses = new ArrayList<DocClass>();
+    @XmlTransient
+    public DocClass parent = null;
 }
