@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
@@ -18,6 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class FileProcessor{
     private TreePackage tree = new TreePackage();
 
     final static String OUT_FILE_EXTENSION = "html";
-    final static boolean GENERATE_DEBUG_XML = true;
+    final static boolean GENERATE_DEBUG_XML = false;
 
     private String className;
     private String shortClassName;
@@ -206,6 +208,7 @@ public class FileProcessor{
      * @param extraLine first word form the line after comment 
      */
     private void processComment(String content, String extraLine){
+        if (content==null) return;
         Comment comment = new Comment(content);
         if(comment.hasTag("@class")){
             processClass(comment);
@@ -254,6 +257,7 @@ public class FileProcessor{
         try {
             File file = new File(fileName);
             currFile = file.getName();
+            System.out.println(MessageFormat.format("Processing: {0}", currFile));
             BufferedReader reader =
                     new BufferedReader(new FileReader(file));
             int numRead;
@@ -504,7 +508,10 @@ public class FileProcessor{
                             .newTemplates (new StreamSource(classTplFileName)) ;
             Transformer transformer = transformation.newTransformer();
 
+            DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
+
             for(DocClass docClass: classes){
+                System.out.println("Saving: " + docClass.className);
                 String targetFileName = new StringBuilder()
                         .append(classTplTargetDir)
                         .append(File.separator)
@@ -512,14 +519,14 @@ public class FileProcessor{
                         .append('.')
                         .append(OUT_FILE_EXTENSION)
                         .toString();
-                Document doc =
-                        builderFactory.newDocumentBuilder().newDocument();
+                Document doc = docBuilder.newDocument();
                 marshaller.marshal(docClass, doc);
                 if (GENERATE_DEBUG_XML){
                     marshaller.marshal(docClass, new File(targetFileName+"_"));
                 }
                 Result fileResult = new StreamResult(new File(targetFileName));
                 transformer.transform(new DOMSource(doc), fileResult);
+                transformer.reset();
             }
 
             // Marshall and transform tree
