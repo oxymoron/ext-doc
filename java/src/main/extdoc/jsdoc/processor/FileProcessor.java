@@ -40,8 +40,10 @@ public class FileProcessor{
 
     private TreePackage tree = new TreePackage();
 
-    final static String OUT_FILE_EXTENSION = "html";
-    final static boolean GENERATE_DEBUG_XML = false;
+    private final static String OUT_FILE_EXTENSION = "html";
+    private final static boolean GENERATE_DEBUG_XML = false;
+    private final static String COMPONENT_NAME =
+            "Ext.Component";
 
     private String className;
     private String shortClassName;
@@ -350,11 +352,15 @@ public class FileProcessor{
         }
     }
 
+
     private void injectInherited(){
         for(DocClass cls: classes){
             DocClass parent = cls.parent;
             while(parent!=null){
-                for(DocCfg cfg: parent.cfgs) {
+                if (parent.className.equals(COMPONENT_NAME)){
+                    cls.component = true;
+                }
+                for(DocCfg cfg: parent.cfgs) {                    
                     cls.cfgs.add(cfg);
                 }
                 for(DocProperty property: parent.properties){
