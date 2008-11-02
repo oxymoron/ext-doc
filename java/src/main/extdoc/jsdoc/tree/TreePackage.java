@@ -31,7 +31,9 @@ public class TreePackage {
     public void addClass(String packageName, DocClass docClass){        
         if (packageName.equals("")){
             TreeClass treeClass = new TreeClass();
-            treeClass.setDocClass(docClass);
+            treeClass.className = docClass.className;
+            treeClass.shortClassName = docClass.shortClassName;
+            treeClass.singleton = docClass.singleton;            
             classes.add(treeClass);
         }else{
             int i=0;
