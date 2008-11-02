@@ -20,7 +20,7 @@ class ParamTagImpl extends TagImpl implements ParamTag {
         paramType = removeBrackets(str[0]);
         paramName = str[1];
         optional = isOptional(str[2]);
-        paramDescription = optional?cutOptional(str[2]):str[2];
+        paramDescription = str[2];
     }
 
     public String getParamType() {
