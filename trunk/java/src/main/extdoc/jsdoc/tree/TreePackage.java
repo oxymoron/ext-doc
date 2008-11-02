@@ -2,6 +2,7 @@ package extdoc.jsdoc.tree;
 
 import extdoc.jsdoc.docs.DocClass;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +15,14 @@ import java.util.List;
 @XmlRootElement
 public class TreePackage {
 
-    private String name;
+    @XmlAttribute
+    public String name;
+
+    public List<TreePackage> packages =
+        new ArrayList<TreePackage>();
 
     public List<TreeClass> classes =
             new ArrayList<TreeClass>();
-
-    public List<TreePackage> packages =
-            new ArrayList<TreePackage>();
 
     public void addClass(DocClass docClass){
         addClass(docClass.packageName, docClass);
@@ -50,19 +52,11 @@ public class TreePackage {
      */
     protected TreePackage addPackage(String packageName){
         for(TreePackage p: packages){
-            if (p.getName().equals(packageName)) return p;
+            if (p.name.equals(packageName)) return p;
         }
         TreePackage p = new TreePackage();
-        p.setName(packageName);
+        p.name = packageName;
         packages.add(p);
         return p;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }
