@@ -11,4 +11,5 @@ public class DocCfg{
     public boolean optional;
     public String description;
     public String className;
+    public String shortClassName;    
 }

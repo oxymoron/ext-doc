@@ -42,6 +42,7 @@ public class FileProcessor{
     final static boolean GENERATE_DEBUG_XML = true;
 
     private String className;
+    private String shortClassName;
     private String currFile;
 
     /**
@@ -105,6 +106,7 @@ public class FileProcessor{
         }
         classes.add(cls);
         className = cls.className;
+        shortClassName = cls.shortClassName;
     }
 
     /**
@@ -119,6 +121,7 @@ public class FileProcessor{
         cfg.description = tag.getCfgDescription();
         cfg.optional = tag.isOptional();
         cfg.className = className;
+        cfg.shortClassName = shortClassName;
         cfgs.add(cfg);
     }
 
@@ -141,8 +144,9 @@ public class FileProcessor{
         }
         property.type = typeTag.getType();
         property.description = comment.getDescription();
-        property.className = className;        
-        properties.add(property);        
+        property.className = className;
+        property.shortClassName = shortClassName;
+        properties.add(property);
     }
 
     /**
@@ -161,6 +165,7 @@ public class FileProcessor{
 
         // should be first because @member may redefine class
         method.className = className;
+        method.shortClassName = shortClassName;
         method.name = extraLine;
         if (methodTag!=null){
             method.name = methodTag.text();
@@ -191,6 +196,7 @@ public class FileProcessor{
         event.description = eventTag.getEventDescription();
         readParams(paramTags, event.params);
         event.className = className;
+        event.shortClassName = shortClassName;
         events.add(event);
     }
 
@@ -342,10 +348,8 @@ public class FileProcessor{
 
     private void injectInherited(){
         for(DocClass cls: classes){
-            System.out.println("Process: " + cls.className);
             DocClass parent = cls.parent;
             while(parent!=null){
-                System.out.println(parent.className);
                 for(DocCfg cfg: parent.cfgs) {
                     cls.cfgs.add(cfg);
                 }
