@@ -314,6 +314,7 @@ public class FileProcessor{
             for(DocClass cls: classes){
                 if(docClass.className.equals(cls.parentClass)){
                     docClass.subClasses.add(cls);
+                    cls.parent = docClass;
                 }
             }
             for(DocCfg cfg: cfgs){
@@ -339,10 +340,26 @@ public class FileProcessor{
         }
     }
 
-    private void injectInherited(List<DocClass> classList, DocClass parent){
-        for(DocClass cls: classList){
-            System.out.println(cls.className);
-            injectInherited(cls.subClasses, cls);
+    private void injectInherited(){
+        for(DocClass cls: classes){
+            System.out.println("Process: " + cls.className);
+            DocClass parent = cls.parent;
+            while(parent!=null){
+                System.out.println(parent.className);
+                for(DocCfg cfg: parent.cfgs) {
+                    cls.cfgs.add(cfg);
+                }
+                for(DocProperty property: parent.properties){
+                    cls.properties.add(property);
+                }
+                for(DocMethod method: parent.methods){
+                    cls.methods.add(method);
+                }
+                for(DocEvent event: parent.events){
+                    cls.events.add(event);
+                }
+                parent = parent.parent;
+            }
         }
     }
 
@@ -369,7 +386,7 @@ public class FileProcessor{
             }
             fileInputStream.close();
             createClassHierarchy();
-            injectInherited(classes, null);
+            injectInherited();
             createPackageHierarchy();
         } catch (JAXBException e) {
             e.printStackTrace();
