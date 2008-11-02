@@ -31,4 +31,5 @@ public class DocClass{
     public List<DocClass> subClasses = new ArrayList<DocClass>();
     @XmlTransient
     public DocClass parent = null;
+    public boolean component = false;
 }

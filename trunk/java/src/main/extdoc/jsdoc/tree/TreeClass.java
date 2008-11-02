@@ -9,5 +9,6 @@ public class TreeClass {
     public boolean singleton;
     public String className;
     public String shortClassName;
+    public boolean component;
 }
 

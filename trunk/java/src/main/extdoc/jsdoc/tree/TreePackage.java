@@ -33,7 +33,8 @@ public class TreePackage {
             TreeClass treeClass = new TreeClass();
             treeClass.className = docClass.className;
             treeClass.shortClassName = docClass.shortClassName;
-            treeClass.singleton = docClass.singleton;            
+            treeClass.singleton = docClass.singleton;
+            treeClass.component = docClass.component;
             classes.add(treeClass);
         }else{
             int i=0;
