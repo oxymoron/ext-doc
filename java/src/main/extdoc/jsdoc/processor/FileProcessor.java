@@ -50,9 +50,71 @@ public class FileProcessor{
     private String shortClassName;
     private String currFile;
 
+    private static final String START_LINK = "{@link";    
+
+    private static enum LinkStates {READ, LINK}
+
+    private String processLink(String text){
+        int len = text.length();
+        boolean found = false;
+        int cut;
+        for(cut=0;cut<len;cut++){
+            char ch = text.charAt(cut);
+            if (ch == '#' || Character.isWhitespace(ch)){
+                found = true;
+                break;
+            }
+        }
+        
+        String cls = found?text.substring(0,cut):text;
+        String attr = found?text.substring(cut+1):"";
+
+        String out;
+        if (found){
+            if (cls.isEmpty()){
+                out = MessageFormat.format("<a href=\"output/{0}.html#{1}\" ext:member=\"{1}\" ext:cls=\"{0}\">{1}</a>", className, attr);
+            }else{
+                out = MessageFormat.format("<a href=\"output/{0}.html#{1}\" ext:member=\"{1}\" ext:cls=\"{0}\">{0}.{1}</a>", cls, attr);                
+            }
+        }else{
+            out = MessageFormat.format("<a href=\"output/{0}.html\" ext:cls=\"{0}\">{0}</a>", cls);
+        }
+        return out;
+    }
 
     private String inlineLinks(String content){
-        return content;
+
+        if (content==null) return content;
+        LinkStates state = LinkStates.READ;
+        StringBuilder sb = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();        
+        for (int i=0;i<content.length();i++){
+            char ch = content.charAt(i);
+            switch (state){
+                case READ:
+                    if (endsWith(buffer, START_LINK)){
+                        sb.append(
+                                buffer.substring(
+                                        0, buffer.length() - START_LINK.length()));
+                        buffer.setLength(0);
+                        state = LinkStates.LINK;
+                        break;
+                    }
+                    buffer.append(ch);
+                    break;
+                case LINK:
+                    if(ch=='}'){
+                        sb.append(processLink(buffer.toString()));
+                        buffer.setLength(0);
+                        state = LinkStates.READ;
+                        break;
+                    }
+                    buffer.append(ch);
+                    break;
+            }
+        }
+        sb.append(buffer);
+        return sb.toString();
     }
 
 
@@ -68,7 +130,7 @@ public class FileProcessor{
             Param param = new Param();
             param.name = paramTag.getParamName();
             param.type = paramTag.getParamType();
-            param.description = paramTag.getParamDescription();
+            param.description = inlineLinks(paramTag.getParamDescription());
             param.optional = paramTag.isOptional();
             params.add(param);
         }
@@ -107,7 +169,7 @@ public class FileProcessor{
         if (description==null && extendsTag!=null){
             description = extendsTag.getClassDescription();
         }
-        cls.description = description;
+        cls.description = inlineLinks(description);
         cls.parentClass =
                 (extendsTag!=null)?extendsTag.getClassName():null;
         cls.hasConstructor = constructorTag!=null;
@@ -129,7 +191,7 @@ public class FileProcessor{
         CfgTag tag = comment.tag("@cfg");
         cfg.name = tag.getCfgName();
         cfg.type = tag.getCfgType();
-        cfg.description = tag.getCfgDescription();
+        cfg.description = inlineLinks(tag.getCfgDescription());
         cfg.optional = tag.isOptional();
         cfg.className = className;
         cfg.shortClassName = shortClassName;
@@ -156,7 +218,7 @@ public class FileProcessor{
             property.name = propertyTag.text();
         }
         property.type = typeTag.getType();
-        property.description = comment.getDescription();
+        property.description = inlineLinks(comment.getDescription());
         property.className = className;
         property.shortClassName = shortClassName;
         property.hide = comment.tag("@hide")!=null;
@@ -189,7 +251,7 @@ public class FileProcessor{
             method.className = memberTag.getClassName();
         }
         method.isStatic = (staticTag!=null);
-        method.description = comment.getDescription();
+        method.description = inlineLinks(comment.getDescription());
         if (returnTag!=null){
             method.returnType =returnTag.getReturnType();
             method.returnDescription =returnTag.getReturnDescription();
@@ -208,7 +270,7 @@ public class FileProcessor{
         EventTag eventTag = comment.tag("@event");
         List<ParamTag> paramTags = comment.tags("@param");
         event.name = eventTag.getEventName();
-        event.description = eventTag.getEventDescription();
+        event.description = inlineLinks(eventTag.getEventDescription());
         readParams(paramTags, event.params);
         event.className = className;
         event.shortClassName = shortClassName;
