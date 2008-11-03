@@ -356,6 +356,14 @@ public class FileProcessor{
         }
     }
 
+    private <T extends DocAttribute> boolean isOverridden(T doc,
+                                                          List<T> docs){
+        if (doc.name == null) return false;
+        for(DocAttribute attr:docs){
+            if (doc.name.equals(attr.name)) return true;
+        }
+        return false;
+    }
 
     private void injectInherited(){
         for(DocClass cls: classes){
@@ -369,16 +377,24 @@ public class FileProcessor{
                     cls.component = true;
                 }
                 for(DocCfg cfg: parent.cfgs) {                    
-                    cls.cfgs.add(cfg);
+                    if (!isOverridden(cfg, cls.cfgs)){
+                        cls.cfgs.add(cfg);
+                    }
                 }
                 for(DocProperty property: parent.properties){
-                    cls.properties.add(property);
+                    if (!isOverridden(property, cls.properties)){
+                        cls.properties.add(property);
+                    }
                 }
                 for(DocMethod method: parent.methods){
-                    cls.methods.add(method);
+                    if (!isOverridden(method, cls.methods)){
+                        cls.methods.add(method);
+                    }
                 }
                 for(DocEvent event: parent.events){
-                    cls.events.add(event);
+                    if (!isOverridden(event, cls.events)){
+                        cls.events.add(event);
+                    }
                 }
                 parent = parent.parent;
             }
