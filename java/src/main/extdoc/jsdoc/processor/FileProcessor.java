@@ -326,7 +326,10 @@ public class FileProcessor{
         for(DocClass docClass: classes){
             for(DocClass cls: classes){
                 if(docClass.className.equals(cls.parentClass)){
-                    docClass.subClasses.add(cls);
+                    ClassDescr subClass = new ClassDescr();
+                    subClass.className = cls.className;
+                    subClass.shortClassName = cls.shortClassName;
+                    docClass.subClasses.add(subClass);
                     cls.parent = docClass;
                 }
             }
@@ -358,6 +361,10 @@ public class FileProcessor{
         for(DocClass cls: classes){
             DocClass parent = cls.parent;
             while(parent!=null){
+                ClassDescr superClass = new ClassDescr();
+                superClass.className = parent.className;
+                superClass.shortClassName = parent.shortClassName;
+                cls.superClasses.add(superClass);
                 if (parent.className.equals(COMPONENT_NAME)){
                     cls.component = true;
                 }
