@@ -27,8 +27,8 @@ public class DocClass{
     public List<DocProperty> properties = new ArrayList<DocProperty>();
     public List<DocMethod> methods = new ArrayList<DocMethod>();
     public List<DocEvent> events = new ArrayList<DocEvent>();
-    @XmlTransient
-    public List<DocClass> subClasses = new ArrayList<DocClass>();
+    public List<ClassDescr> subClasses = new ArrayList<ClassDescr>();
+    public List<ClassDescr> superClasses = new ArrayList<ClassDescr>();
     @XmlTransient
     public DocClass parent = null;
     public boolean component = false;
