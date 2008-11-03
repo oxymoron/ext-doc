@@ -257,9 +257,10 @@ public class FileProcessor{
      */
     private void processFile(String fileName){
         try {
-            File file = new File(fileName);
+            File file = new File(new File(fileName).getAbsolutePath());
             currFile = file.getName();
-            System.out.println(MessageFormat.format("Processing: {0}", currFile));
+            System.out.println(
+                    MessageFormat.format("Processing: {0}", currFile));
             BufferedReader reader =
                     new BufferedReader(new FileReader(file));
             int numRead;
@@ -443,7 +444,8 @@ public class FileProcessor{
         new File(folderName).mkdirs();
         try {
 
-            File templateFile = new File(templateFileName);
+            File templateFile =
+                    new File(new File(templateFileName).getAbsolutePath());
             String templateFolder = templateFile.getParent();
 
             // Read template.xml
