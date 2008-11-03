@@ -22,6 +22,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 
 /**
@@ -48,6 +49,12 @@ public class FileProcessor{
     private String className;
     private String shortClassName;
     private String currFile;
+
+
+    private String inlineLinks(String content){
+        return content;
+    }
+
 
     /**
      *  Read params from list of param tags and add them to list of params
@@ -126,6 +133,8 @@ public class FileProcessor{
         cfg.optional = tag.isOptional();
         cfg.className = className;
         cfg.shortClassName = shortClassName;
+        cfg.hide = comment.tag("@hide")!=null
+                || cfg.description.startsWith("@hide");
         cfgs.add(cfg);
     }
 
@@ -150,6 +159,7 @@ public class FileProcessor{
         property.description = comment.getDescription();
         property.className = className;
         property.shortClassName = shortClassName;
+        property.hide = comment.tag("@hide")!=null;
         properties.add(property);
     }
 
@@ -185,6 +195,7 @@ public class FileProcessor{
             method.returnDescription =returnTag.getReturnDescription();
         }
         readParams(paramTags, method.params);
+        method.hide = comment.tag("@hide")!=null;
         methods.add(method);
     }
 
@@ -201,6 +212,7 @@ public class FileProcessor{
         readParams(paramTags, event.params);
         event.className = className;
         event.shortClassName = shortClassName;
+        event.hide = comment.tag("@hide")!=null;
         events.add(event);
     }
 
@@ -365,6 +377,24 @@ public class FileProcessor{
         return false;
     }
 
+    private <T extends DocAttribute> void removeHidden
+                                                                                        (List<T> docs){
+        for(ListIterator<T> it = docs.listIterator(); it.hasNext();){
+            if (it.next().hide)
+                it.remove();
+        }
+    }
+
+    private <T extends DocAttribute> void addInherited
+                                                    (List<T> childDocs, List<T> parentDocs){
+        for(T attr: parentDocs) {
+            if (!isOverridden(attr, childDocs)){
+                childDocs.add(attr);
+            }
+        }
+    }
+
+
     private void injectInherited(){
         for(DocClass cls: classes){
             DocClass parent = cls.parent;
@@ -376,28 +406,17 @@ public class FileProcessor{
                 if (parent.className.equals(COMPONENT_NAME)){
                     cls.component = true;
                 }
-                for(DocCfg cfg: parent.cfgs) {                    
-                    if (!isOverridden(cfg, cls.cfgs)){
-                        cls.cfgs.add(cfg);
-                    }
-                }
-                for(DocProperty property: parent.properties){
-                    if (!isOverridden(property, cls.properties)){
-                        cls.properties.add(property);
-                    }
-                }
-                for(DocMethod method: parent.methods){
-                    if (!isOverridden(method, cls.methods)){
-                        cls.methods.add(method);
-                    }
-                }
-                for(DocEvent event: parent.events){
-                    if (!isOverridden(event, cls.events)){
-                        cls.events.add(event);
-                    }
-                }
+                addInherited(cls.cfgs, parent.cfgs);
+                addInherited(cls.properties, parent.properties);
+                addInherited(cls.methods, parent.methods);
+                addInherited(cls.events, parent.events);
                 parent = parent.parent;
             }
+            removeHidden(cls.cfgs);
+            removeHidden(cls.properties);
+            removeHidden(cls.methods);
+            removeHidden(cls.events);
+
         }
     }
 

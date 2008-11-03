@@ -10,4 +10,5 @@ public abstract class DocAttribute {
     public String description;
     public String className;
     public String shortClassName;
+    public boolean hide;
 }
