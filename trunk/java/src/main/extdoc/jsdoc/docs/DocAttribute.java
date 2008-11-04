@@ -7,7 +7,7 @@ package extdoc.jsdoc.docs;
  */
 public abstract class DocAttribute {
     public String name;
-    public String description;
+    public Description description;
     public String className;
     public String shortClassName;
     public boolean hide;

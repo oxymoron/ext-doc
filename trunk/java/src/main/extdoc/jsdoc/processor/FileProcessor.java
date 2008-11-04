@@ -42,7 +42,7 @@ public class FileProcessor{
     private TreePackage tree = new TreePackage();
 
     private final static String OUT_FILE_EXTENSION = "html";
-    private final static boolean GENERATE_DEBUG_XML = false;
+    private final static boolean GENERATE_DEBUG_XML = true;
     private final static String COMPONENT_NAME =
             "Ext.Component";
 
@@ -54,7 +54,25 @@ public class FileProcessor{
 
     private static enum LinkStates {READ, LINK}
 
-    private String processLink(String text){
+    private static final String
+            MEMBER_REFERENCE_TPL =
+            "<a href=\"output/{0}.html#{1}\" " +
+                    "ext:member=\"{1}\" ext:cls=\"{0}\">{1}</a>";
+    private static final String
+            CLASS_AND_MEMBER_REFERENCE_TPL =
+            "<a href=\"output/{0}.html#{1}\" " +
+                    "ext:member=\"{1}\" ext:cls=\"{0}\">{0}.{1}</a>";
+    private static final String
+            CLASS_AND_MEMBER_REFERENCE_TPL_SHORT =
+            "{0}.{1}";
+    private static final String
+            CLASS_REFERENCE_TPL =
+            "<a href=\"output/{0}.html\" " +
+                    "ext:cls=\"{0}\">{0}</a>";
+
+    private static final int DESCR_MAX_LENGTH = 117;
+    
+    private String[] processLink(String text){
         int len = text.length();
         boolean found = false;
         int cut;
@@ -69,33 +87,56 @@ public class FileProcessor{
         String cls = found?text.substring(0,cut):text;
         String attr = found?text.substring(cut+1):"";
 
-        String out;
+        String longText, shortText;
         if (found){
             if (cls.isEmpty()){
-                out = MessageFormat.format("<a href=\"output/{0}.html#{1}\" ext:member=\"{1}\" ext:cls=\"{0}\">{1}</a>", className, attr);
+                longText = MessageFormat.format(
+                        MEMBER_REFERENCE_TPL, className, attr);
+                shortText = attr;
             }else{
-                out = MessageFormat.format("<a href=\"output/{0}.html#{1}\" ext:member=\"{1}\" ext:cls=\"{0}\">{0}.{1}</a>", cls, attr);                
+                longText = MessageFormat.format(
+                        CLASS_AND_MEMBER_REFERENCE_TPL, cls, attr);
+                shortText = 
+                        MessageFormat.format(
+                                CLASS_AND_MEMBER_REFERENCE_TPL_SHORT,
+                                    cls, attr);
             }
         }else{
-            out = MessageFormat.format("<a href=\"output/{0}.html\" ext:cls=\"{0}\">{0}</a>", cls);
+            longText = MessageFormat.format(CLASS_REFERENCE_TPL, cls);
+            shortText = cls;
         }
-        return out;
+        return new String[]{longText, shortText};
     }
 
-    private String inlineLinks(String content){
+    private Description inlineLinks(String content){
+        return inlineLinks(content, false);
+    }
 
-        if (content==null) return content;
+    /**
+     * Replaces inline tag @link to actual html links and returns shot and/or
+     *  long versions.
+     * @param content description content
+     * @param alwaysGenerateShort forces to generate short version for
+     * Methods and events
+     * @return short and long versions
+     */
+    private Description inlineLinks(String content,
+                                                                boolean alwaysGenerateShort){
+
+        if (content==null) return null;
         LinkStates state = LinkStates.READ;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sbHtml = new StringBuilder();
+        StringBuilder sbText = new StringBuilder();
         StringBuilder buffer = new StringBuilder();        
         for (int i=0;i<content.length();i++){
             char ch = content.charAt(i);
             switch (state){
                 case READ:
                     if (endsWith(buffer, START_LINK)){
-                        sb.append(
-                                buffer.substring(
-                                        0, buffer.length() - START_LINK.length()));
+                        String substr = buffer.substring(
+                                            0, buffer.length() - START_LINK.length());
+                        sbHtml.append(substr);
+                        sbText.append(substr);
                         buffer.setLength(0);
                         state = LinkStates.LINK;
                         break;
@@ -104,7 +145,9 @@ public class FileProcessor{
                     break;
                 case LINK:
                     if(ch=='}'){
-                        sb.append(processLink(buffer.toString()));
+                        String[] str = processLink(buffer.toString()); 
+                        sbHtml.append(str[0]);
+                        sbText.append(str[1]);
                         buffer.setLength(0);
                         state = LinkStates.READ;
                         break;
@@ -113,8 +156,33 @@ public class FileProcessor{
                     break;
             }
         }
-        sb.append(buffer);
-        return sb.toString();
+
+        // append remaining
+        sbHtml.append(buffer);
+        sbText.append(buffer);
+
+        String sbString = sbText.toString().replaceAll("<\\S*?>","");        
+
+        Description description = new Description();
+        description.longDescr =  sbHtml.toString();
+        if(alwaysGenerateShort){
+            description.hasShort = true;
+            description.shortDescr =
+                sbString.length()>DESCR_MAX_LENGTH?
+                        new StringBuilder()
+                            .append(sbString.substring(0, DESCR_MAX_LENGTH))
+                            .append("...").toString()
+                :sbString;
+        }else{
+            description.hasShort = sbString.length()>DESCR_MAX_LENGTH;
+            description.shortDescr =
+                description.hasShort?
+                        new StringBuilder()
+                            .append(sbString.substring(0, DESCR_MAX_LENGTH))
+                            .append("...").toString()
+                :null;
+        }
+        return description;
     }
 
 
@@ -169,7 +237,8 @@ public class FileProcessor{
         if (description==null && extendsTag!=null){
             description = extendsTag.getClassDescription();
         }
-        cls.description = inlineLinks(description);
+        Description descr = inlineLinks(description);
+        cls.description = descr!=null?descr.longDescr:null;
         cls.parentClass =
                 (extendsTag!=null)?extendsTag.getClassName():null;
         cls.hasConstructor = constructorTag!=null;
@@ -196,7 +265,7 @@ public class FileProcessor{
         cfg.className = className;
         cfg.shortClassName = shortClassName;
         cfg.hide = comment.tag("@hide")!=null
-                || cfg.description.startsWith("@hide");
+                || cfg.description.longDescr.startsWith("@hide");
         cfgs.add(cfg);
     }
 
@@ -251,7 +320,7 @@ public class FileProcessor{
             method.className = memberTag.getClassName();
         }
         method.isStatic = (staticTag!=null);
-        method.description = inlineLinks(comment.getDescription());
+        method.description = inlineLinks(comment.getDescription(), true);
         if (returnTag!=null){
             method.returnType =returnTag.getReturnType();
             method.returnDescription =returnTag.getReturnDescription();
@@ -270,7 +339,7 @@ public class FileProcessor{
         EventTag eventTag = comment.tag("@event");
         List<ParamTag> paramTags = comment.tags("@param");
         event.name = eventTag.getEventName();
-        event.description = inlineLinks(eventTag.getEventDescription());
+        event.description = inlineLinks(eventTag.getEventDescription(), true);
         readParams(paramTags, event.params);
         event.className = className;
         event.shortClassName = shortClassName;
