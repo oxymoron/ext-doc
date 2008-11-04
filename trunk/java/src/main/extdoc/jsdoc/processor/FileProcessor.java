@@ -280,7 +280,7 @@ public class FileProcessor{
         Tag propertyTag = comment.tag("@property");
         TypeTag typeTag = comment.tag("@type");
 
-        property.name = extraLine;
+        property.name = dividePackage(extraLine)[1];
         if (propertyTag!=null
                 && propertyTag.text()!=null 
                 && propertyTag.text().length()>0){
