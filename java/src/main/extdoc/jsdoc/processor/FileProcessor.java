@@ -313,13 +313,30 @@ public class FileProcessor{
         method.shortClassName = shortClassName;
         method.name = extraLine;
         if (methodTag!=null){
-            method.name = methodTag.text();
+            if (!methodTag.text().isEmpty()){
+                method.name = methodTag.text();
+            }else{
+                // case when @method is there but empty
+                // usually something like: Ext.util.Observable.prototype.on
+                // mathod name will be set to the last word
+                method.name = dividePackage(extraLine)[1];
+            }
         }
         if (memberTag!=null){
             method.name = memberTag.getMethodName();
             method.className = memberTag.getClassName();
         }
         method.isStatic = (staticTag!=null);
+
+        // renaming if static
+        if(method.isStatic){
+            method.name = new StringBuilder()
+                    .append(shortClassName)
+                    .append('.')
+                    .append(dividePackage(extraLine)[1])
+                    .toString();
+        }
+
         method.description = inlineLinks(comment.getDescription(), true);
         if (returnTag!=null){
             method.returnType =returnTag.getReturnType();
@@ -391,7 +408,7 @@ public class FileProcessor{
      * @return true if space or new line or * or / or ' etc...
      */
     private boolean isWhite(char ch){
-        return !Character.isLetterOrDigit(ch);
+        return !Character.isLetterOrDigit(ch) && ch!='.';
     }
 
     /**
