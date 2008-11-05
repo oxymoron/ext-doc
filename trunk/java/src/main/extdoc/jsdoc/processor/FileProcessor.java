@@ -198,7 +198,8 @@ public class FileProcessor{
             Param param = new Param();
             param.name = paramTag.getParamName();
             param.type = paramTag.getParamType();
-            param.description = inlineLinks(paramTag.getParamDescription());
+            Description descr = inlineLinks(paramTag.getParamDescription());
+            param.description = descr!=null?descr.longDescr:null;
             param.optional = paramTag.isOptional();
             params.add(param);
         }
@@ -576,7 +577,7 @@ public class FileProcessor{
 
     public void process(String fileName){
         try {
-            File xmlFile = new File(fileName);
+            File xmlFile = new File(new File(fileName).getAbsolutePath());
             FileInputStream fileInputStream = new FileInputStream(xmlFile);
             JAXBContext jaxbContext =
                     JAXBContext.newInstance("extdoc.jsdoc.schema");
