@@ -8,6 +8,6 @@ package extdoc.jsdoc.docs;
 public class Param {
     public String type;
     public String name;
-    public Description description;
+    public String description;
     public boolean optional;
 }
