@@ -244,7 +244,7 @@ public class FileProcessor{
                 (extendsTag!=null)?extendsTag.getClassName():null;
         cls.hasConstructor = constructorTag!=null;
         if (constructorTag!=null){
-            cls.constructorDescription = constructorTag.text();
+            cls.constructorDescription = inlineLinks(constructorTag.text());
             readParams(paramTags, cls.params);
         }
         classes.add(cls);

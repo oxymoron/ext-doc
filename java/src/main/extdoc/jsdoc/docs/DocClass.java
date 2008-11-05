@@ -21,7 +21,7 @@ public class DocClass{
     public String description;
     public String parentClass;
     public boolean hasConstructor;
-    public String constructorDescription;
+    public Description constructorDescription;
     public List<Param> params = new ArrayList<Param>();
     public List<DocCfg> cfgs = new ArrayList<DocCfg>();
     public List<DocProperty> properties = new ArrayList<DocProperty>();
