@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xsl:stylesheet [
+  <!ENTITY nbsp "&#160;">
+]>        
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ext="http://www.extjs.com">
+<xsl:output method="html" indent="yes"/>
+    <xsl:template match="/docClass">        
+        <div class="body-wrap">
+            <div class="top-tools">
+                <a class="inner-link" href="#{className}-props">
+                <img src="resources/images/default/s.gif" class="item-icon icon-prop"/>Properties</a>
+                <a class="inner-link" href="#{className}-methods">
+			    <img src="resources/images/default/s.gif" class="item-icon icon-method"/>Methods</a>
+		        <a class="inner-link" href="#{className}-events">
+			    <img src="resources/images/default/s.gif" class="item-icon icon-event"/>Events</a>
+		        <a class="bookmark" href="../docs/?class={className}">
+			    <img src="resources/images/default/s.gif" class="item-icon icon-fav"/>Direct Link</a>
+	        </div>
+            <xsl:if test="superClasses">
+                <div class="inheritance res-block">
+                    <pre class="res-block-inner">
+                        <xsl:for-each select="superClasses">
+                            <xsl:sort select="position()" order="descending"/>
+                            <a href="output/{className}.html" ext:member="" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
+                            <xsl:text>&#x0D;</xsl:text>
+                            <img style="padding-left:{(position()-1)*15}px" src="resources/elbow-end.gif"/>
+                        </xsl:for-each>
+                        <xsl:value-of select="shortClassName"/>
+                    </pre>
+                </div>
+            </xsl:if>
+            <h1>Class <xsl:value-of select="className"/></h1>
+            <table cellspacing="0">
+                <tr>
+                    <td class="label">Package:</td>
+                    <td class="hd-info">
+                        <xsl:choose>
+                            <xsl:when test="packageName!=''"><xsl:value-of select="packageName"/></xsl:when>
+                            <xsl:otherwise>Global</xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                </tr>
+                <tr><td class="label">Defined In:</td><td class="hd-info"><xsl:value-of select="definedIn"/></td></tr>
+                <tr><td class="label">Class:</td><td class="hd-info"><xsl:value-of select="shortClassName"/></td></tr>
+                <xsl:if test="subClasses">
+                    <tr>
+                        <td class="label">Subclasses:</td>
+                        <td class="hd-info">
+                            <xsl:for-each select="subClasses">
+                                <xsl:sort select="shortClassName"/>
+                                <a href="output/{className}.html" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
+                                <xsl:if test="position()!=last()">,&nbsp;&#x0D;</xsl:if>
+                            </xsl:for-each>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <tr>
+                    <td class="label">Extends:</td><td class="hd-info">
+                        <xsl:choose>
+                            <xsl:when test="superClasses">
+                                <a href="output/{superClasses[1]/className}.html" ext:cls="{superClasses[1]/className}" ext:member=""><xsl:value-of select="superClasses[1]/shortClassName"/></a>
+                            </xsl:when>
+                            <xsl:otherwise>Object</xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                </tr>
+            </table>
+            <div class="description"><xsl:value-of select="description" disable-output-escaping="yes"/></div>
+            <div class="hr"> </div>
+
+            <!--Configs-->
+            <xsl:if test="cfgs">
+                <a id="{className}-configs"> </a>
+                <h2>Config Options</h2>
+                <table cellspacing="0" class="member-table">
+                    <tbody>
+                        <tr>
+                            <th colspan="2" class="sig-header">Config Options</th>
+                            <th class="msource-header">Defined By</th>
+                        </tr>
+                        <xsl:for-each select="cfgs">
+                            <xsl:sort select="name"/>
+                            <xsl:variable name="inherited">
+                                <xsl:if test="/docClass/className!=className">inherited</xsl:if>
+                            </xsl:variable>
+                            <xsl:variable name="cls">
+                                <xsl:if test="description/hasShort='true'">expandable</xsl:if>
+                            </xsl:variable>
+                            <tr class="config-row {$cls} {$inherited}">
+                                <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                <td class="sig">
+                                    <a id="{className}-{name}"/>
+                                    <b><xsl:value-of select="name"/></b> : <xsl:value-of select="type"/>
+                                    <div class="mdesc">
+                                            <xsl:choose>
+                                                <xsl:when test="description/hasShort='true'">
+                                                    <div class="short"><xsl:value-of select="description/shortDescr"/></div>
+                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></div>
+                                                </xsl:when>
+                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></xsl:otherwise>
+                                            </xsl:choose>
+                                    </div>
+                                </td>
+                                  <xsl:call-template name="msource">
+                                      <xsl:with-param name="inherited" select="$inherited='inherited'"/>
+                                  </xsl:call-template>
+                            </tr>
+                        </xsl:for-each>
+                    </tbody>
+                </table>
+            </xsl:if>
+
+            <!--Properties-->
+            <a id="{className}-props"> </a>
+            <h2>Public Properties</h2>
+            <xsl:choose>
+                <xsl:when test="properties">
+                    <table cellspacing="0" class="member-table">
+                        <tbody>
+                            <tr>
+                                <th colspan="2" class="sig-header">Property</th>
+                                <th class="msource-header">Defined By</th>
+                            </tr>
+                            <xsl:for-each select="properties">
+                                <xsl:sort select="name"/>
+                                <xsl:variable name="inherited">
+                                    <xsl:if test="/docClass/className!=className">inherited</xsl:if>
+                                </xsl:variable>
+                                <xsl:variable name="cls">
+                                    <xsl:if test="description/hasShort='true'">expandable</xsl:if>
+                                </xsl:variable>
+                                <tr class="property-row {$cls} {$inherited}">
+                                    <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                    <td class="sig">
+                                        <a id="{className}-{name}"/>
+                                        <b><xsl:value-of select="name"/></b> : <xsl:value-of select="type"/>
+                                        <div class="mdesc">
+                                            <xsl:choose>
+                                                <xsl:when test="description/hasShort='true'">
+                                                    <div class="short"><xsl:value-of select="description/shortDescr"/></div>
+                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></div>
+                                                </xsl:when>
+                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></xsl:otherwise>
+                                            </xsl:choose>
+                                        </div>
+                                    </td>
+                                      <xsl:call-template name="msource">
+                                          <xsl:with-param name="inherited" select="$inherited='inherited'"/>
+                                      </xsl:call-template>
+                                </tr>
+                            </xsl:for-each>
+                        </tbody>
+                    </table>            
+                </xsl:when>
+                <xsl:otherwise><div class="no-members">This class has no public properties.</div></xsl:otherwise>
+            </xsl:choose>
+
+            <!--Methods-->
+            <a id="{className}-methods"> </a>
+            <h2>Public Methods</h2>
+            <xsl:choose>
+                <xsl:when test="methods">
+                    <table cellspacing="0" class="member-table">
+                        <tbody>
+                            <tr>
+                                <th colspan="2" class="sig-header">Method</th>
+                                <th class="msource-header">Defined By</th>
+                            </tr>
+                            <xsl:if test="hasConstructor='true'">
+                                <xsl:call-template name="constructor"/>
+                            </xsl:if>                            
+                            <xsl:for-each select="methods[isStatic!='true']">
+                                <xsl:sort select="name"/>
+                                <xsl:variable name="inherited">
+                                    <xsl:if test="/docClass/className!=className">inherited</xsl:if>
+                                </xsl:variable>
+                                <tr class="method-row expandable {$inherited}">
+                                    <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                    <td class="sig">
+                                        <a id="{className}-{name}"/>
+                                        <b><xsl:value-of select="name"/></b>
+                                        <xsl:call-template name="method-params"/>:
+                                        <xsl:choose>
+                                            <xsl:when test="returnType"><xsl:value-of select="returnType"/></xsl:when>
+                                            <xsl:otherwise>void</xsl:otherwise>
+                                        </xsl:choose>
+                                        <div class="mdesc">
+                                            <div class="short"><xsl:value-of select="description/shortDescr"/></div>
+                                            <div class="long">
+                                                <xsl:value-of select="description/longDescr" disable-output-escaping="yes"/>
+                                                <xsl:call-template name="method-params-details"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                  <xsl:call-template name="msource">
+                                      <xsl:with-param name="inherited" select="$inherited='inherited'"/>
+                                  </xsl:call-template>
+                                </tr>
+                            </xsl:for-each>
+                        </tbody>
+                    </table>
+                </xsl:when>
+                <xsl:otherwise><div class="no-members">This class has no public methods.</div></xsl:otherwise>
+            </xsl:choose>
+
+            <!--Events-->
+            <a id="{className}-events"> </a>
+            <h2>Public Events</h2>
+            <xsl:choose>
+                <xsl:when test="events">
+                  <table cellspacing="0" class="member-table">
+                      <tbody>
+                          <tr>
+                              <th colspan="2" class="sig-header">Event</th>
+                              <th class="msource-header">Defined By</th>
+                          </tr>
+                          <xsl:for-each select="events">
+                              <xsl:sort select="name"/>
+                              <xsl:variable name="inherited">
+                                <xsl:if test="/docClass/className!=className">inherited</xsl:if>
+                              </xsl:variable>
+                              <tr class="method-row expandable {$inherited}">
+                                  <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                  <td class="sig">
+                                      <a id="{className}-{name}"/>
+                                      <b><xsl:value-of select="name"/></b>
+                                      <xsl:call-template name="method-params"/>
+                                      <div class="mdesc">
+                                          <div class="short"><xsl:value-of select="description/shortDescr"/></div>
+                                          <div class="long">
+                                              <xsl:value-of select="description/longDescr" disable-output-escaping="yes"/>
+                                              <div class="mdetail-params">
+                                                  <strong style="font-weight: normal;">Listeners will be called with the following arguments:</strong>
+                                                  <ul>
+                                                      <xsl:if test="count(params)=0">
+                                                          <li>None.</li>
+                                                      </xsl:if>
+                                                      <xsl:for-each select="params">
+                                                          <li>
+                                                              <code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/>
+                                                              <div class="sub-desc">
+                                                                  <xsl:value-of select="description" disable-output-escaping="yes"/>
+                                                              </div>
+                                                          </li>
+                                                      </xsl:for-each>
+                                                  </ul>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  <xsl:call-template name="msource">
+                                      <xsl:with-param name="inherited" select="$inherited='inherited'"/>
+                                  </xsl:call-template>
+                              </tr>
+                          </xsl:for-each>
+                      </tbody>
+                  </table>
+              </xsl:when>
+                <xsl:otherwise><div class="no-members">This class has no public events.</div></xsl:otherwise>
+            </xsl:choose>
+            
+        </div>
+    </xsl:template>
+
+    <!-- Right column with link to parent class -->
+    <xsl:template name="msource">
+        <xsl:param name="inherited"/>
+        <td class="msource">
+              <xsl:choose>
+                    <xsl:when test="$inherited">
+                        <a href="output/{className}.html#{name}" ext:member="#{name}" ext:cls="{className}">
+                            <xsl:value-of select="shortClassName"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="shortClassName"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+          </td>
+    </xsl:template>
+
+    <xsl:template name="constructor">
+       <tr class="method-row expandable">
+            <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+            <td class="sig">
+                <a id="{className}-{shortClassName}"/>
+                <b><xsl:value-of select="shortClassName"/></b>
+                <xsl:call-template name="method-params"/>
+                <div class="mdesc">
+                    <div class="short"><xsl:value-of select="constructorDescription/shortDescr"/></div>
+                    <div class="long">
+                        <xsl:value-of select="constructorDescription/longDescr" disable-output-escaping="yes"/>
+                        <xsl:call-template name="method-params-details"/>
+                    </div>
+                </div>
+            </td>
+          <xsl:call-template name="msource">
+              <xsl:with-param name="inherited" select="false()"/>
+          </xsl:call-template>
+        </tr>
+    </xsl:template>
+
+    <!-- Method Parameters in short-->
+    <xsl:template name="method-params">
+        (<xsl:for-each select="params">
+            <xsl:choose>
+                <xsl:when test="optional='true'">
+                    [<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]
+                </xsl:when>
+                <xsl:otherwise>
+                    <code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="position()!=last()">,</xsl:if>
+        </xsl:for-each>)
+    </xsl:template>
+
+
+
+    <!-- Method Parameters processing-->
+    <xsl:template name="method-params-details">
+        <div class="mdetail-params">
+            <strong>Parameters:</strong>
+            <ul>
+                <xsl:if test="count(params)=0">
+                    <li>None.</li>
+                </xsl:if>
+                <xsl:for-each select="params">
+                    <li>
+                        <code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/>
+                        <div class="sub-desc">
+                            <xsl:value-of select="description" disable-output-escaping="yes"/>
+                        </div>
+                    </li>
+                </xsl:for-each>
+            </ul>
+            <strong>Returns:</strong>
+            <ul>
+                <li>
+                    <xsl:choose>
+                        <xsl:when test="returnType"><xsl:value-of select="returnType"/></xsl:when>
+                        <xsl:otherwise>void</xsl:otherwise>
+                    </xsl:choose>
+                </li>
+            </ul>
+        </div>
+    </xsl:template>
+
+</xsl:stylesheet>
