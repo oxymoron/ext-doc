@@ -250,7 +250,8 @@ public class FileProcessor{
             readParams(paramTags, cls.params);
         }
         // Skip private classes
-        if (!comment.hasTag("@private")) {
+        if (!comment.hasTag("@private")
+                && !comment.hasTag("@ignore")) {
             classes.add(cls);
         }
         className = cls.className;
@@ -263,7 +264,8 @@ public class FileProcessor{
      */
     private void processCfg(Comment comment){
         // Skip private
-        if (comment.hasTag("@private")) return;
+        if (comment.hasTag("@private")
+                || comment.hasTag("@ignore")) return;
         DocCfg cfg = new DocCfg();
         CfgTag tag = comment.tag("@cfg");
         cfg.name = tag.getCfgName();
@@ -284,7 +286,9 @@ public class FileProcessor{
      */
     private void processProperty(Comment comment,String extraLine){
         // Skip private
-        if (comment.hasTag("@private")) return;
+        if (comment.hasTag("@private")
+                || comment.hasTag("@ignore")) return;
+
         
         DocProperty property = new DocProperty();
 
@@ -312,7 +316,9 @@ public class FileProcessor{
      */
     private void processMethod(Comment comment, String extraLine){
         // Skip private
-        if (comment.hasTag("@private")) return;
+        if (comment.hasTag("@private")
+                || comment.hasTag("@ignore")) return;
+
 
         DocMethod method = new DocMethod();
 
@@ -367,7 +373,9 @@ public class FileProcessor{
      */
     private void processEvent(Comment comment){
         // Skip private
-        if (comment.hasTag("@private")) return;
+        if (comment.hasTag("@private")
+                || comment.hasTag("@ignore")) return;
+
         
         DocEvent event = new DocEvent();
         EventTag eventTag = comment.tag("@event");
