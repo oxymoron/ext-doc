@@ -3,7 +3,9 @@ package extdoc.jsdoc.tags.impl;
 import extdoc.jsdoc.tags.Tag;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: Andrey Zubkov
@@ -12,6 +14,9 @@ import java.util.List;
  */
 
 public class Comment {
+
+    public static Map<String, Integer> allTags
+            = new HashMap<String, Integer>();
 
     private final List<Tag> tagList = new ArrayList<Tag>();
 
@@ -179,6 +184,10 @@ public class Comment {
                     }else{
                         tag = new TagImpl(tagName, tx);
                     }
+
+                    Integer num = allTags.get(tagName);
+                    allTags.put(tagName, num==null?1:num+1);
+
                     tagList.add(tag);
                 }
             }

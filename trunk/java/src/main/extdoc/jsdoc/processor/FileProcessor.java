@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 
 /**
@@ -220,6 +221,7 @@ public class FileProcessor{
      * @param comment Comment
      */
     private void processClass(Comment comment){
+
         DocClass cls = new DocClass();
         
         ClassTag classTag = comment.tag("@class");
@@ -247,7 +249,10 @@ public class FileProcessor{
             cls.constructorDescription = inlineLinks(constructorTag.text(), true);
             readParams(paramTags, cls.params);
         }
-        classes.add(cls);
+        // Skip private classes
+        if (!comment.hasTag("@private")) {
+            classes.add(cls);
+        }
         className = cls.className;
         shortClassName = cls.shortClassName;
     }
@@ -257,6 +262,8 @@ public class FileProcessor{
      * @param comment Comment
      */
     private void processCfg(Comment comment){
+        // Skip private
+        if (comment.hasTag("@private")) return;
         DocCfg cfg = new DocCfg();
         CfgTag tag = comment.tag("@cfg");
         cfg.name = tag.getCfgName();
@@ -276,6 +283,9 @@ public class FileProcessor{
      * @param extraLine first word form the line after comment
      */
     private void processProperty(Comment comment,String extraLine){
+        // Skip private
+        if (comment.hasTag("@private")) return;
+        
         DocProperty property = new DocProperty();
 
         Tag propertyTag = comment.tag("@property");
@@ -301,6 +311,9 @@ public class FileProcessor{
      * @param extraLine first word form the line after comment
      */
     private void processMethod(Comment comment, String extraLine){
+        // Skip private
+        if (comment.hasTag("@private")) return;
+
         DocMethod method = new DocMethod();
 
         Tag methodTag = comment.tag("@method");
@@ -353,6 +366,9 @@ public class FileProcessor{
      * @param comment Comment
      */
     private void processEvent(Comment comment){
+        // Skip private
+        if (comment.hasTag("@private")) return;
+        
         DocEvent event = new DocEvent();
         EventTag eventTag = comment.tag("@event");
         List<ParamTag> paramTags = comment.tags("@param");
@@ -570,8 +586,14 @@ public class FileProcessor{
     }
 
     private void createPackageHierarchy(){
-        for(DocClass cls: classes){            
+        for(DocClass cls: classes){
             tree.addClass(cls);
+        }
+    }
+
+    private void showStatistics(){
+        for (Map.Entry<String, Integer> e : Comment.allTags.entrySet()){
+            System.out.println(e.getKey() + ": " + e.getValue());        
         }
     }
 
@@ -590,6 +612,7 @@ public class FileProcessor{
             for(extdoc.jsdoc.schema.File file: files){
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
             }
+            showStatistics();
             fileInputStream.close();
             createClassHierarchy();
             injectInherited();
