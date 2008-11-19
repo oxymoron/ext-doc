@@ -249,6 +249,7 @@ public class FileProcessor{
             cls.constructorDescription = inlineLinks(constructorTag.text(), true);
             readParams(paramTags, cls.params);
         }
+
         // Skip private classes
         if (!comment.hasTag("@private")
                 && !comment.hasTag("@ignore")) {
@@ -256,6 +257,30 @@ public class FileProcessor{
         }
         className = cls.className;
         shortClassName = cls.shortClassName;
+
+        // Process cfg declared inside class definition
+        // goes after global className set
+        List<CfgTag> innerCfgs =  comment.tags("@cfg");
+        for (CfgTag innerCfg: innerCfgs){
+            DocCfg cfg = getDocCfg(innerCfg);
+            cfgs.add(cfg);
+        }
+        
+    }
+
+    /**
+     * Helper method to process cfg in separate comment and in class
+     * definition
+     */
+    private DocCfg getDocCfg(CfgTag tag){
+        DocCfg cfg = new DocCfg();
+        cfg.name = tag.getCfgName();
+        cfg.type = tag.getCfgType();
+        cfg.description = inlineLinks(tag.getCfgDescription());
+        cfg.optional = tag.isOptional();
+        cfg.className = className;
+        cfg.shortClassName = shortClassName;
+        return cfg;
     }
 
     /**
@@ -266,14 +291,8 @@ public class FileProcessor{
         // Skip private
         if (comment.hasTag("@private")
                 || comment.hasTag("@ignore")) return;
-        DocCfg cfg = new DocCfg();
         CfgTag tag = comment.tag("@cfg");
-        cfg.name = tag.getCfgName();
-        cfg.type = tag.getCfgType();
-        cfg.description = inlineLinks(tag.getCfgDescription());
-        cfg.optional = tag.isOptional();
-        cfg.className = className;
-        cfg.shortClassName = shortClassName;
+        DocCfg cfg = getDocCfg(tag);
         cfg.hide = comment.tag("@hide")!=null
                 || cfg.description.longDescr.startsWith("@hide");
         cfgs.add(cfg);
