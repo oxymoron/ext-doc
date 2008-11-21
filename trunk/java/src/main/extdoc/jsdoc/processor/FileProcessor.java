@@ -206,7 +206,48 @@ public class FileProcessor{
         }
     }
 
-    private String[] dividePackage(String className){
+
+    /**
+     * Separates fullclass name to package and class
+     * By this rule:
+     * Ext => pkg: "" cls: "Ext"
+     * Ext.Button => pkg: "Ext" cls: "Button"
+     * Ext.util.Observable => pkg: "Ext.util" cls: "Observable"
+     * Ext.layout.BorderLayout.Region => pkg: "Ext.layout" cls: "BorderLayout.Region"
+     * Ext.Updater.BasicRenderer => pkg: "Ext" cls: "Updater.BasicRenderer"
+     * @param className Class name to parse
+     * @return Array of strings [0] package [1] class
+     */
+    private String[] separatePackage(String className){
+        String [] str = new String[2];
+        String[] items = className.split("\\.");
+        if (items.length == 1){
+            str[0] = "";
+            str[1] = className;
+        }else{
+            StringBuilder pkg = new StringBuilder(items[0]);
+            StringBuilder cls = new StringBuilder(items[items.length - 1]);
+            for(int i=items.length-2;i>0;i--){
+                if (Character.isUpperCase(items[i].charAt(0))){
+                    // if starts with capital it is a part of class name
+                    cls.insert(0, '.');
+                    cls.insert(0, items[i]);
+                }else{
+                    // insert remaining package name
+                    for(int j =1;j<=i;j++){
+                        pkg.append('.');
+                        pkg.append(items[j]);
+                    }
+                    break;
+                }
+            }
+            str[0] = pkg.toString();
+            str[1] = cls.toString();
+        }
+        return str;
+    }
+
+    private String[] separateByLastDot(String className){
         String[] str = new String[2];
         int len = className.length();
         int i = len-1;
@@ -231,7 +272,7 @@ public class FileProcessor{
         List<ParamTag> paramTags = comment.tags("@param");
 
         cls.className = classTag.getClassName();
-        String[] str = dividePackage(cls.className);
+        String[] str = separatePackage(cls.className);
         cls.packageName = str[0];
         cls.shortClassName = str[1];
         cls.definedIn = currFile;
@@ -294,7 +335,8 @@ public class FileProcessor{
         CfgTag tag = comment.tag("@cfg");
         DocCfg cfg = getDocCfg(tag);
         cfg.hide = comment.tag("@hide")!=null
-                || cfg.description.longDescr.startsWith("@hide");
+                || (cfg.description!=null 
+                    && cfg.description.longDescr.startsWith("@hide"));
         cfgs.add(cfg);
     }
 
@@ -314,7 +356,7 @@ public class FileProcessor{
         Tag propertyTag = comment.tag("@property");
         TypeTag typeTag = comment.tag("@type");
 
-        property.name = dividePackage(extraLine)[1];
+        property.name = separateByLastDot(extraLine)[1];
         if (propertyTag!=null
                 && propertyTag.text()!=null 
                 && propertyTag.text().length()>0){
@@ -358,7 +400,7 @@ public class FileProcessor{
                 // case when @method is there but empty
                 // usually something like: Ext.util.Observable.prototype.on
                 // mathod name will be set to the last word
-                method.name = dividePackage(extraLine)[1];
+                method.name = separateByLastDot(extraLine)[1];
             }
         }
         if (memberTag!=null){
@@ -372,7 +414,7 @@ public class FileProcessor{
             method.name = new StringBuilder()
                     .append(shortClassName)
                     .append('.')
-                    .append(dividePackage(extraLine)[1])
+                    .append(separateByLastDot(extraLine)[1])
                     .toString();
         }
 
