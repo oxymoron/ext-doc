@@ -8,13 +8,13 @@
         <div class="body-wrap">
             <div class="top-tools">
                 <a class="inner-link" href="#{className}-props">
-                <img src="resources/images/default/s.gif" class="item-icon icon-prop"/>Properties</a>
+                <img src="resources/images/default/s.gif" class="item-icon icon-prop"/>Properties</a><xsl:text>&#x0D;</xsl:text>
                 <a class="inner-link" href="#{className}-methods">
-			    <img src="resources/images/default/s.gif" class="item-icon icon-method"/>Methods</a>
+			    <img src="resources/images/default/s.gif" class="item-icon icon-method"/>Methods</a><xsl:text>&#x0D;</xsl:text>
 		        <a class="inner-link" href="#{className}-events">
-			    <img src="resources/images/default/s.gif" class="item-icon icon-event"/>Events</a>
+			    <img src="resources/images/default/s.gif" class="item-icon icon-event"/>Events</a><xsl:text>&#x0D;</xsl:text>
 		        <a class="bookmark" href="../docs/?class={className}">
-			    <img src="resources/images/default/s.gif" class="item-icon icon-fav"/>Direct Link</a>
+			    <img src="resources/images/default/s.gif" class="item-icon icon-fav"/>Direct Link</a><xsl:text>&#x0D;</xsl:text>
 	        </div>
             <xsl:if test="superClasses">
                 <div class="inheritance res-block">
@@ -304,8 +304,7 @@
     </xsl:template>
 
     <!-- Method Parameters in short-->
-    <xsl:template name="method-params">
-        (<xsl:for-each select="params">
+    <xsl:template name="method-params">(<xsl:if test="count(params)&gt;0">&nbsp;</xsl:if><xsl:for-each select="params">
             <xsl:choose>
                 <xsl:when test="optional='true'">
                     [<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]
@@ -314,8 +313,8 @@
                     <code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:if test="position()!=last()">,</xsl:if>
-        </xsl:for-each>)
+            <xsl:if test="position()!=last()">,&nbsp;</xsl:if>
+        </xsl:for-each><xsl:if test="count(params)&gt;0">&nbsp;</xsl:if>)
     </xsl:template>
 
 
@@ -324,27 +323,10 @@
     <xsl:template name="method-params-details">
         <div class="mdetail-params">
             <strong>Parameters:</strong>
-            <ul>
-                <xsl:if test="count(params)=0">
-                    <li>None.</li>
-                </xsl:if>
-                <xsl:for-each select="params">
-                    <li>
-                        <code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/>
-                        <div class="sub-desc">
-                            <xsl:value-of select="description" disable-output-escaping="yes"/>
-                        </div>
-                    </li>
-                </xsl:for-each>
-            </ul>
+            <ul><xsl:if test="count(params)=0"><li>None.</li></xsl:if><xsl:for-each select="params"><li><code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/><div class="sub-desc"><xsl:value-of select="description" disable-output-escaping="yes"/></div></li></xsl:for-each></ul>
             <strong>Returns:</strong>
             <ul>
-                <li>
-                    <xsl:choose>
-                        <xsl:when test="returnType"><xsl:value-of select="returnType"/></xsl:when>
-                        <xsl:otherwise>void</xsl:otherwise>
-                    </xsl:choose>
-                </li>
+                <li><xsl:choose><xsl:when test="returnType"><code><xsl:value-of select="returnType"/></code><div class="sub-desc"><xsl:value-of select="returnDescription"/></div></xsl:when><xsl:otherwise>void</xsl:otherwise></xsl:choose></li>
             </ul>
         </div>
     </xsl:template>
