@@ -65,7 +65,10 @@
                     </td>
                 </tr>
             </table>
-            <div class="description"><xsl:value-of select="description" disable-output-escaping="yes"/></div>
+            <div class="description">
+                <xsl:value-of select="description" disable-output-escaping="yes"/>
+                <xsl:if test="singleton='true'"><br/><br/><i>This class is a singleton and cannot be created directly.</i></xsl:if>
+            </div>
             <div class="hr"> </div>
 
             <!--Configs-->
