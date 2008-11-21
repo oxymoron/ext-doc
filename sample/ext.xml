@@ -157,5 +157,13 @@
 		<file src="ext/source/widgets/Slider.js"/>
 		<file src="ext/source/widgets/StatusBar.js"/>
 		<file src="ext/source/util/History.js"/>
+        <file src="ext/air/src/FileProvider.js" />
+        <file src="ext/air/src/NativeObservable.js" />
+        <file src="ext/air/src/NativeWindow.js" />
+        <file src="ext/air/src/SystemTray.js" />
+        <file src="ext/air/src/NativeDD.js" />
+        <file src="ext/air/src/Sound.js" />
+        <file src="ext/air/src/SystemMenu.js" />
+
     </source>
 </doc>
