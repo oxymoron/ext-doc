@@ -246,6 +246,7 @@ public class FileProcessor{
 
     private String[] separateByLastDot(String className){
         String[] str = new String[2];
+        if(className==null) return str;
         int len = className.length();
         int i = len-1;
         while(i>=0 && className.charAt(i)!='.') i--;
@@ -602,9 +603,11 @@ public class FileProcessor{
 
     private <T extends DocAttribute> boolean isOverridden(T doc,
                                                           List<T> docs){
-        if (doc.name == null) return false;
+        if (doc.name == null || doc.name.isEmpty()) return false;
         for(DocAttribute attr:docs){
-            if (doc.name.equals(attr.name)) return true;
+            String docName = separateByLastDot(doc.name)[1];
+            String attrName = separateByLastDot(attr.name)[1];
+            if (docName.equals(attrName)) return true;
         }
         return false;
     }
