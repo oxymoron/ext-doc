@@ -82,7 +82,6 @@
                             <th class="msource-header">Defined By</th>
                         </tr>
                         <xsl:for-each select="cfgs">
-                            <xsl:sort select="name" case-order="upper-first"/>
                             <xsl:variable name="inherited">
                                 <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                             </xsl:variable>
@@ -125,7 +124,6 @@
                                 <th class="msource-header">Defined By</th>
                             </tr>
                             <xsl:for-each select="properties">
-                                <xsl:sort select="name" case-order="upper-first"/>
                                 <xsl:variable name="inherited">
                                     <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                                 </xsl:variable>
@@ -173,7 +171,6 @@
                                 <xsl:call-template name="constructor"/>
                             </xsl:if>                            
                             <xsl:for-each select="methods">
-                                <xsl:sort select="name" case-order="upper-first"/>
                                 <xsl:variable name="inherited">
                                     <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                                 </xsl:variable>
@@ -222,7 +219,6 @@
                               <th class="msource-header">Defined By</th>
                           </tr>
                           <xsl:for-each select="events">
-                              <xsl:sort select="name" case-order="upper-first"/>
                               <xsl:variable name="inherited">
                                 <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                               </xsl:variable>
