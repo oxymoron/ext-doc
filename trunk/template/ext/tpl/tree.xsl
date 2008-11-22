@@ -20,13 +20,11 @@
 
 	<xsl:template match="treePackage|packages">
 		<xsl:for-each select="packages">
-        <xsl:sort select="@name"/>
                 {"id":"pkg-<xsl:value-of select="@name"/>","text":"<xsl:value-of select="@name"/>","iconCls":"icon-pkg","cls":"package","singleClickExpand":true, children:[<xsl:apply-templates select="."/>]}
 				<xsl:if test="position()!=last()">,</xsl:if>
 			</xsl:for-each>
 			<xsl:if test="count(packages)!=0 and count(classes)!=0">,</xsl:if>
-			<xsl:for-each select="classes">
-			<xsl:sort select="shortClassName"/>
+			<xsl:for-each select="classes">			
                 <xsl:variable name="icon">
                     <xsl:choose>
                         <xsl:when test="singleton='true'">icon-static</xsl:when>
