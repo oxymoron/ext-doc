@@ -392,31 +392,37 @@ public class FileProcessor{
         // should be first because @member may redefine class
         method.className = className;
         method.shortClassName = shortClassName;
-        method.name = extraLine;
+        method.name = separateByLastDot(extraLine)[1];
         if (methodTag!=null){
             if (!methodTag.text().isEmpty()){
                 method.name = methodTag.text();
-            }else{
+            }
+//            else{
                 // case when @method is there but empty
                 // usually something like: Ext.util.Observable.prototype.on
                 // mathod name will be set to the last word
-                method.name = separateByLastDot(extraLine)[1];
-            }
+//                method.name = separateByLastDot(extraLine)[1];
+//            }
         }
         if (memberTag!=null){
-            method.name = memberTag.getMethodName();
+            String name = memberTag.getMethodName();
+            if (name!=null){
+                method.name = name;
+            }
             method.className = memberTag.getClassName();
+            method.shortClassName =
+                    separatePackage(method.className)[1];            
         }
         method.isStatic = (staticTag!=null);
 
         // renaming if static
-        if(method.isStatic){
-            method.name = new StringBuilder()
-                    .append(shortClassName)
-                    .append('.')
-                    .append(separateByLastDot(extraLine)[1])
-                    .toString();
-        }
+//        if(method.isStatic){
+//            method.name = new StringBuilder()
+//                    .append(shortClassName)
+//                    .append('.')
+//                    .append(separateByLastDot(extraLine)[1])
+//                    .toString();
+//        }
 
         method.description = inlineLinks(comment.getDescription(), true);
         if (returnTag!=null){
