@@ -172,7 +172,7 @@
                             <xsl:if test="hasConstructor='true'">
                                 <xsl:call-template name="constructor"/>
                             </xsl:if>                            
-                            <xsl:for-each select="methods[isStatic!='true']">
+                            <xsl:for-each select="methods">
                                 <xsl:sort select="name" case-order="upper-first"/>
                                 <xsl:variable name="inherited">
                                     <xsl:if test="/docClass/className!=className">inherited</xsl:if>
@@ -188,8 +188,12 @@
                                             <xsl:otherwise>void</xsl:otherwise>
                                         </xsl:choose>
                                         <div class="mdesc">
-                                            <div class="short"><xsl:value-of select="description/shortDescr"/></div>
+                                            <div class="short">
+                                                <xsl:call-template name="check-if-static"/>
+                                                <xsl:value-of select="description/shortDescr"/>
+                                            </div>
                                             <div class="long">
+                                                <xsl:call-template name="check-if-static"/>
                                                 <xsl:value-of select="description/longDescr" disable-output-escaping="yes"/>
                                                 <xsl:call-template name="method-params-details"/>
                                             </div>
@@ -306,12 +310,8 @@
     <!-- Method Parameters in short-->
     <xsl:template name="method-params">(<xsl:if test="count(params)&gt;0">&nbsp;</xsl:if><xsl:for-each select="params">
             <xsl:choose>
-                <xsl:when test="optional='true'">
-                    [<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]
-                </xsl:when>
-                <xsl:otherwise>
-                    <code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>
-                </xsl:otherwise>
+                <xsl:when test="optional='true'">[<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]</xsl:when>
+                <xsl:otherwise><code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code></xsl:otherwise>
             </xsl:choose>
             <xsl:if test="position()!=last()">,&nbsp;</xsl:if>
         </xsl:for-each><xsl:if test="count(params)&gt;0">&nbsp;</xsl:if>)
@@ -346,6 +346,11 @@
                 </li>
             </ul>
         </div>
+    </xsl:template>
+
+    <!-- Shows <static> if item is static-->
+    <xsl:template name="check-if-static">
+        <xsl:if test="isStatic='true'">&lt;static&gt;&nbsp;</xsl:if>    
     </xsl:template>
 
 </xsl:stylesheet>
