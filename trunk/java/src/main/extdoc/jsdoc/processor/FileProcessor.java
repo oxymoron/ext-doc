@@ -359,7 +359,7 @@ public class FileProcessor{
                 && propertyTag.text().length()>0){
             property.name = propertyTag.text();
         }
-        property.type = typeTag.getType();
+        property.type = typeTag!=null?typeTag.getType():null;
         property.description = inlineLinks(comment.getDescription());
         property.className = className;
         property.shortClassName = shortClassName;
@@ -461,7 +461,8 @@ public class FileProcessor{
             processEvent(comment);
         }else if(comment.hasTag("@cfg")){
             processCfg(comment);
-        }else if(comment.hasTag("@type")){
+        }else if(comment.hasTag("@property")
+                || comment.hasTag("@type")){
             processProperty(comment, extraLine);        
         }else{
             processMethod(comment, extraLine);            
