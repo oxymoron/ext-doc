@@ -13,7 +13,11 @@
 			    <img src="resources/images/default/s.gif" class="item-icon icon-method"/>Methods</a><xsl:text>&#x0D;</xsl:text>
 		        <a class="inner-link" href="#{className}-events">
 			    <img src="resources/images/default/s.gif" class="item-icon icon-event"/>Events</a><xsl:text>&#x0D;</xsl:text>
-		        <a class="bookmark" href="../docs/?class={className}">
+                <xsl:if test="cfgs">
+                    <a class="inner-link" href="#{className}-configs">
+                    <img src="resources/images/default/s.gif" class="item-icon icon-config"/>Config Options</a><xsl:text>&#x0D;</xsl:text>
+                </xsl:if>
+                <a class="bookmark" href="../docs/?class={className}">
 			    <img src="resources/images/default/s.gif" class="item-icon icon-fav"/>Direct Link</a><xsl:text>&#x0D;</xsl:text>
 	        </div>
             <xsl:if test="superClasses">
@@ -49,7 +53,7 @@
                             <xsl:for-each select="subClasses">
                                 <xsl:sort select="shortClassName"/>
                                 <a href="output/{className}.html" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
-                                <xsl:if test="position()!=last()">,&nbsp;&#x0D;</xsl:if>
+                                <xsl:if test="position()!=last()"><xsl:text>,&nbsp;</xsl:text></xsl:if>
                             </xsl:for-each>
                         </td>
                     </tr>
