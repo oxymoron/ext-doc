@@ -30,14 +30,20 @@ class TagImpl implements Tag {
         String[] str = new String[parts];
         int c = 0;
         int start = 0;
-        char ch;
+        boolean skipWhite = true;
         for(int i=0;i<text.length();i++){
-            ch = text.charAt(i);
-            if (c < parts-1 && Character.isWhitespace(ch)){
-                str[c] = text.substring(start, i);
-                start = i+1;
-                c++;
+            char ch = text.charAt(i);
+            boolean isWhite = Character.isWhitespace(ch);
+            if (isWhite){
+                if(!skipWhite){
+                    str[c] = text.substring(start, i);
+                    start = i;
+                    c++;
+                }
+                start++;
+                if (c >= parts-1) break;
             }
+            skipWhite = isWhite;
         }
         str[c] = text.substring(start, text.length());
         return str;
