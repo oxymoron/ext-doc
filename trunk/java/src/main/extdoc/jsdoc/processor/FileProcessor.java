@@ -654,6 +654,8 @@ public class FileProcessor{
             Collections.sort(cls.methods);
             Collections.sort(cls.events);
 
+            Collections.reverse(cls.superClasses);
+
         }
     }
 
