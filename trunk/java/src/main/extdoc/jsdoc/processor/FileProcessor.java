@@ -491,7 +491,7 @@ public class FileProcessor{
      * @return true if space or new line or * or / or ' etc...
      */
     private boolean isWhite(char ch){
-        return !Character.isLetterOrDigit(ch) && ch!='.';
+        return !Character.isLetterOrDigit(ch) && ch!='.' && ch!='_';
     }
 
     /**
