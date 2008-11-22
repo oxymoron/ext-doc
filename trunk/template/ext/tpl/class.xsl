@@ -37,16 +37,7 @@
                 <tr><td class="label">Defined In:</td><td class="hd-info"><xsl:value-of select="definedIn"/></td></tr>
                 <tr><td class="label">Class:</td><td class="hd-info"><xsl:value-of select="shortClassName"/></td></tr>
                 <xsl:if test="subClasses">
-                    <tr>
-                        <td class="label">Subclasses:</td>
-                        <td class="hd-info">
-                            <xsl:for-each select="subClasses">
-                                <xsl:sort select="shortClassName"/>
-                                <a href="output/{className}.html" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
-                                <xsl:if test="position()!=last()"><xsl:text>,&nbsp;</xsl:text></xsl:if>
-                            </xsl:for-each>
-                        </td>
-                    </tr>
+                    <xsl:call-template name="sub-classes"/>
                 </xsl:if>
                 <tr>
                     <td class="label">Extends:</td><td class="hd-info">
@@ -368,6 +359,19 @@
                 <xsl:with-param name="n" select="$n - 1"/>
             </xsl:call-template>
         </xsl:if>
+    </xsl:template>
+
+    <!-- Shows subclasses -->
+    <xsl:template name="sub-classes">
+        <tr>
+            <td class="label">Subclasses:</td>
+            <td class="hd-info">
+                <xsl:for-each select="subClasses">
+                    <a href="output/{className}.html" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
+                    <xsl:if test="position()!=last()"><xsl:text>,&#x0D;</xsl:text></xsl:if>
+                </xsl:for-each>
+            </td>
+        </tr>
     </xsl:template>
 
 </xsl:stylesheet>

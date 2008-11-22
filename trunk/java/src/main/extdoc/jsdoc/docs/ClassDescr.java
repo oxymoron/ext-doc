@@ -5,7 +5,11 @@ package extdoc.jsdoc.docs;
  * Date: 03.11.2008
  * Time: 19:04:43
  */
-public class ClassDescr {
+public class ClassDescr implements Comparable<ClassDescr>{
     public String className;
     public String shortClassName;
+
+    public int compareTo(ClassDescr o) {
+        return className.compareTo(o.className);
+    }
 }
