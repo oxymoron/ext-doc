@@ -20,10 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -650,6 +647,12 @@ public class FileProcessor{
             removeHidden(cls.properties);
             removeHidden(cls.methods);
             removeHidden(cls.events);
+
+            // sorting
+            Collections.sort(cls.cfgs);
+            Collections.sort(cls.properties);
+            Collections.sort(cls.methods);
+            Collections.sort(cls.events);
 
         }
     }
