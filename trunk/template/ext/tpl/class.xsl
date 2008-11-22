@@ -323,10 +323,27 @@
     <xsl:template name="method-params-details">
         <div class="mdetail-params">
             <strong>Parameters:</strong>
-            <ul><xsl:if test="count(params)=0"><li>None.</li></xsl:if><xsl:for-each select="params"><li><code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/><div class="sub-desc"><xsl:value-of select="description" disable-output-escaping="yes"/></div></li></xsl:for-each></ul>
+            <ul>
+                <xsl:if test="count(params)=0">
+                    <li>None.</li>
+                </xsl:if>
+                <xsl:for-each select="params">
+                    <li>
+                        <code><xsl:value-of select="name"/></code> : <xsl:value-of select="type"/>
+                        <div class="sub-desc"><xsl:value-of select="description" disable-output-escaping="yes"/></div>
+                    </li>
+                </xsl:for-each></ul>
             <strong>Returns:</strong>
             <ul>
-                <li><xsl:choose><xsl:when test="returnType"><code><xsl:value-of select="returnType"/></code><div class="sub-desc"><xsl:value-of select="returnDescription"/></div></xsl:when><xsl:otherwise>void</xsl:otherwise></xsl:choose></li>
+                <li>
+                    <xsl:choose>
+                        <xsl:when test="returnType">
+                            <code><xsl:value-of select="returnType"/></code>
+                            <div class="sub-desc"><xsl:value-of select="returnDescription"/></div>
+                        </xsl:when>
+                        <xsl:otherwise>void</xsl:otherwise>
+                    </xsl:choose>
+                </li>
             </ul>
         </div>
     </xsl:template>
