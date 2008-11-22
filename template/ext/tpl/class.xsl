@@ -21,17 +21,7 @@
 			    <img src="resources/images/default/s.gif" class="item-icon icon-fav"/>Direct Link</a><xsl:text>&#x0D;</xsl:text>
 	        </div>
             <xsl:if test="superClasses">
-                <div class="inheritance res-block">
-                    <pre class="res-block-inner">
-                        <xsl:for-each select="superClasses">
-                            <xsl:sort select="position()" order="descending"/>
-                            <a href="output/{className}.html" ext:member="" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a>
-                            <xsl:text>&#x0D;</xsl:text>
-                            <img style="padding-left:{(position()-1)*15}px" src="resources/elbow-end.gif"/>
-                        </xsl:for-each>
-                        <xsl:value-of select="shortClassName"/>
-                    </pre>
-                </div>
+                <xsl:call-template name="super-classes"/>
             </xsl:if>
             <h1>Class <xsl:value-of select="className"/></h1>
             <table cellspacing="0">
@@ -351,6 +341,33 @@
     <!-- Shows <static> if item is static-->
     <xsl:template name="check-if-static">
         <xsl:if test="isStatic='true'">&lt;static&gt;&nbsp;</xsl:if>    
+    </xsl:template>
+
+    <!-- Shows inheritance tree in the right side -->
+    <xsl:template name="super-classes">
+        <div class="inheritance res-block">
+            <pre class="res-block-inner">
+                <xsl:for-each select="superClasses">
+                    <a href="output/{className}.html" ext:member="" ext:cls="{className}"><xsl:value-of select="shortClassName"/></a><xsl:text>&#x0D;</xsl:text>
+                    <xsl:call-template name="spacer">
+                        <xsl:with-param name="n" select="position()"/>
+                    </xsl:call-template>
+                    <img src="resources/elbow-end.gif"/>
+                </xsl:for-each>
+                <xsl:value-of select="shortClassName"/>
+            </pre>
+        </div>
+    </xsl:template>
+
+    <!-- Recursive template generates "n" number of space elements -->
+    <xsl:template name="spacer">        
+        <xsl:param name="n"/>
+        <xsl:if test="$n&gt;0">
+            <xsl:text>&nbsp;&nbsp;</xsl:text>
+            <xsl:call-template name="spacer">
+                <xsl:with-param name="n" select="$n - 1"/>
+            </xsl:call-template>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>
