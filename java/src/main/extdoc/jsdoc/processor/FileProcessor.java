@@ -664,6 +664,7 @@ public class FileProcessor{
         for(DocClass cls: classes){
             tree.addClass(cls);
         }
+        tree.sort();
     }
 
     private void showStatistics(){

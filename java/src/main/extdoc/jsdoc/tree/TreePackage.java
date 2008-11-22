@@ -5,6 +5,7 @@ import extdoc.jsdoc.docs.DocClass;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  * Time: 16:48:21
  */
 @XmlRootElement
-public class TreePackage {
+public class TreePackage implements Comparable<TreePackage>{
 
     @XmlAttribute
     public String name;
@@ -61,5 +62,20 @@ public class TreePackage {
         p.name = packageName;
         packages.add(p);
         return p;
+    }
+
+    /**
+     * Recursive sort for all packages and classes
+     */
+    public void sort(){
+        for(TreePackage p: packages){
+            p.sort();
+        }
+        Collections.sort(packages);
+        Collections.sort(classes);
+    }
+
+    public int compareTo(TreePackage o) {
+        return name.compareTo(o.name);
     }
 }
