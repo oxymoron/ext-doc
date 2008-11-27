@@ -181,6 +181,8 @@ public class Comment {
                         tag = new MemberTagImpl(tagName, tx);
                     }else if (tagName.equals("@event")){
                         tag = new EventTagImpl(tagName, tx);
+                    }else if (tagName.equals("@property")){
+                        tag = new PropertyTagImpl(tagName, tx);
                     }else{
                         tag = new TagImpl(tagName, tx);
                     }
