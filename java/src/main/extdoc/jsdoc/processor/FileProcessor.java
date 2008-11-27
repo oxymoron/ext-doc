@@ -354,17 +354,23 @@ public class FileProcessor{
         
         DocProperty property = new DocProperty();
 
-        Tag propertyTag = comment.tag("@property");
+        PropertyTag propertyTag = comment.tag("@property");
         TypeTag typeTag = comment.tag("@type");
 
         property.name = separateByLastDot(extraLine)[1];
-        if (propertyTag!=null
-                && propertyTag.text()!=null 
-                && propertyTag.text().length()>0){
-            property.name = propertyTag.text();
+        String description = comment.getDescription();
+        if (propertyTag!=null){
+            String propertyName = propertyTag.getPropertyName();
+            if (propertyName!=null && propertyName.length()>0){
+                property.name = propertyName;    
+            }
+            String propertyDescription = propertyTag.getPropertyDescription();
+            if (propertyDescription!=null && propertyDescription.length()>0){
+                description = propertyDescription;
+            }
         }
         property.type = typeTag!=null?typeTag.getType():null;
-        property.description = inlineLinks(comment.getDescription());
+        property.description = inlineLinks(description);
         property.className = className;
         property.shortClassName = shortClassName;
         property.hide = comment.tag("@hide")!=null;
