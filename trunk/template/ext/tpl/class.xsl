@@ -291,7 +291,7 @@
     <!-- Method Parameters in short-->
     <xsl:template name="method-params">(<xsl:if test="count(params)&gt;0">&nbsp;</xsl:if><xsl:for-each select="params">
             <xsl:choose>
-                <xsl:when test="optional='true'">[<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]</xsl:when>
+                <xsl:when test="optional='true'"><span title="Optional" class="optional">[<code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code>]</span></xsl:when>
                 <xsl:otherwise><code><xsl:value-of select="type"/>&nbsp;<xsl:value-of select="name"/></code></xsl:otherwise>
             </xsl:choose>
             <xsl:if test="position()!=last()">,&nbsp;</xsl:if>
