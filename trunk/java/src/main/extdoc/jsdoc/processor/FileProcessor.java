@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 
 /**
@@ -29,6 +30,8 @@ import java.util.*;
  * Time: 4:41:12
  */
 public class FileProcessor{
+
+    private static Logger logger = Logger.getLogger("extdoc.jsdoc.processor");
 
     public List<DocClass> classes = new ArrayList<DocClass>();
     public List<DocCfg> cfgs = new ArrayList<DocCfg>();
@@ -504,7 +507,7 @@ public class FileProcessor{
         try {
             File file = new File(new File(fileName).getAbsolutePath());
             currFile = file.getName();
-            System.out.println(
+            logger.info(
                     MessageFormat.format("Processing: {0}", currFile));
             BufferedReader reader =
                     new BufferedReader(new FileReader(file));
@@ -672,8 +675,9 @@ public class FileProcessor{
     }
 
     private void showStatistics(){
+        logger.info("*** STATISTICS ***") ;
         for (Map.Entry<String, Integer> e : Comment.allTags.entrySet()){
-            System.out.println(e.getKey() + ": " + e.getValue());        
+            logger.info(e.getKey() + ": " + e.getValue());        
         }
     }
 
@@ -771,6 +775,7 @@ public class FileProcessor{
                     .append(treeTemplate.getTargetFile())
                     .toString();
 
+            logger.info("*** COPY RESOURCES ***") ;
             new File(classTplTargetDir).mkdirs();
 
             // Copy resources
@@ -812,8 +817,9 @@ public class FileProcessor{
 
             DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 
+            logger.info("*** SAVING FILES ***") ;
             for(DocClass docClass: classes){
-                System.out.println("Saving: " + docClass.className);
+                logger.info("Saving: " + docClass.className);
                 String targetFileName = new StringBuilder()
                         .append(classTplTargetDir)
                         .append(File.separator)
