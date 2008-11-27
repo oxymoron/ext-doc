@@ -43,7 +43,7 @@
                     <td class="label">Extends:</td><td class="hd-info">
                         <xsl:choose>
                             <xsl:when test="superClasses">
-                                <a href="output/{superClasses[1]/className}.html" ext:cls="{superClasses[1]/className}" ext:member=""><xsl:value-of select="superClasses[1]/shortClassName"/></a>
+                                <a href="output/{superClasses[last()]/className}.html" ext:cls="{superClasses[last()]/className}" ext:member=""><xsl:value-of select="superClasses[last()]/shortClassName"/></a>
                             </xsl:when>
                             <xsl:otherwise>Object</xsl:otherwise>
                         </xsl:choose>
