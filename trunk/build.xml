@@ -42,6 +42,7 @@
         <copy todir="${build.dir}/dist/ext-doc-${version}/sample">
             <fileset dir="sample" includes="*.*"/>
         </copy>
+        <copy todir="${build.dir}/dist/ext-doc-${version}" file="README.txt"/>
         <zip destfile="${build.dir}/ext-doc-${version}.zip" basedir="${build.dir}/dist"/>        
     </target>
     
