@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="ext-doc" default="all">
 
+    <property file="build.properties"/>
+    <property name="version" value="snapshot"/>    
+
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <fileset dir="lib" includes="jaxb-xjc.jar"/>
@@ -8,27 +11,34 @@
     </taskdef>
     
     <target name="clean">
-        <delete dir="bin"/>
-        <delete dir="build"/>
-        <delete dir="java/src/main/extdoc/jsdoc/schema"/>
-        <delete dir="java/src/main/extdoc/jsdoc/tplschema"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${src.dir}/extdoc/jsdoc/schema"/>
+        <delete dir="${src.dir}/extdoc/jsdoc/tplschema"/>
     </target>
 
     <target name="compile">
-        <mkdir dir="bin"/>
-        <xjc schema="schema/ext-doc.xsd" destdir="java/src/main" package="extdoc.jsdoc.schema"/>
-        <xjc schema="schema/template.xsd" destdir="java/src/main" package="extdoc.jsdoc.tplschema"/>
-        <javac srcdir="java/src/main" destdir="bin"/>        
+        <mkdir dir="${build.dir}/classes"/>
+        <xjc schema="${schema.dir}/ext-doc.xsd" destdir="${src.dir}" package="extdoc.jsdoc.schema"/>
+        <xjc schema="${schema.dir}/template.xsd" destdir="${src.dir}" package="extdoc.jsdoc.tplschema"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}/classes" debug="on"/>        
     </target>
                                                                                 
     <target name="jar" depends="compile">
-        <mkdir dir="build"/>
-        <jar destfile="build/ext-doc.jar">
-            <fileset dir="bin" includes="**/*.class"/>
+        <mkdir dir="${build.dir}/dist"/>
+        <mkdir dir="${build.dir}/dist/ext-doc-${version}"/>        
+        <jar destfile="${build.dir}/dist/ext-doc-${version}/ext-doc-${version}.jar">
+            <fileset dir="${build.dir}/classes" includes="**/*.class"/>
             <manifest>
                 <attribute name="Main-Class" value="extdoc.Main"/>
             </manifest>
         </jar>
+    </target>
+
+    <target name="dist" depends="jar">
+        <mkdir dir="distribute"/>
+        <zip destfile="distribute/ext-doc.zip">
+        </zip>
+
     </target>
     
     <target name="all" depends="clean, compile, jar" description="build all"/>
