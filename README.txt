@@ -11,4 +11,7 @@ Quick Start:
 2) Create "sample/ext" folder
 3) Copy ExtJS source to "samplel/ext" (ex.: sample/ext/source/core/Ext.js)
 4) Run sample/ext-doc.bat ("output" directory will be created)
-5) Copy "output" to http server 
+5) Copy "output" to http server
+
+
+ Andrey Zubkov aka oxymoron
