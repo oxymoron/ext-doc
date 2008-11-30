@@ -35,10 +35,14 @@
     </target>
 
     <target name="dist" depends="jar">
-        <mkdir dir="distribute"/>
-        <zip destfile="distribute/ext-doc.zip">
-        </zip>
-
+        <copy todir="${build.dir}/dist/ext-doc-${version}/template">
+            <fileset dir="template"/>
+        </copy>
+        <mkdir dir="${build.dir}/dist/ext-doc-${version}/sample"/>
+        <copy todir="${build.dir}/dist/ext-doc-${version}/sample">
+            <fileset dir="sample" includes="*.*"/>
+        </copy>
+        <zip destfile="${build.dir}/ext-doc-${version}.zip" basedir="${build.dir}/dist"/>        
     </target>
     
     <target name="all" depends="clean, compile, jar" description="build all"/>

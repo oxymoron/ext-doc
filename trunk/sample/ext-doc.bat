@@ -1,1 +1,1 @@
-java -jar ../build/ext-doc.jar ext.xml c:\wamp\www\ext-doc\output ../template/ext/template.xml
+java -jar ../ext-doc-snapshot.jar ext.xml ../output ../template/ext/template.xml
