@@ -40,8 +40,9 @@ class TagImpl implements Tag {
                     start = i;
                     c++;
                 }
-                start++;
-                if (c >= parts-1) break;
+                start++;                
+            }else if(c >= parts-1){
+                break;
             }
             skipWhite = isWhite;
         }
