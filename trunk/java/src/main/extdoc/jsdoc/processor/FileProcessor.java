@@ -5,6 +5,7 @@ import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
 import extdoc.jsdoc.tplschema.*;
 import extdoc.jsdoc.tree.TreePackage;
+import extdoc.jsdoc.util.StringUtils;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
@@ -56,26 +57,14 @@ public class FileProcessor{
     private static enum LinkStates {READ, LINK}
 
     private static final String
-            MEMBER_REFERENCE_TPL =
+        MEMBER_REFERENCE_TPL =
             "<a href=\"output/{0}.html#{1}\" " +
-                    "ext:member=\"{1}\" ext:cls=\"{0}\">{1}</a>";
+                    "ext:member=\"{1}\" ext:cls=\"{0}\">{2}</a>";
+
     private static final String
-            CLASS_AND_MEMBER_REFERENCE_TPL =
-            "<a href=\"output/{0}.html#{1}\" " +
-                    "ext:member=\"{1}\" ext:cls=\"{0}\">{0}.{1}</a>";
-    private static final String
-            CLASS_AND_MEMBER_REFERENCE_TPL_SHORT =
-            "{0}.{1}";
-    private static final String
-            CLASS_REFERENCE_TPL =
+        CLASS_REFERENCE_TPL =
             "<a href=\"output/{0}.html\" " +
-                    "ext:cls=\"{0}\">{0}</a>";
-
-    private static final String
-               CLASS_REFERENCE_RENAMED_TPL =
-               "<a href=\"output/{0}.html\" " +
-                       "ext:cls=\"{0}\">{1}</a>";
-
+                    "ext:cls=\"{0}\">{1}</a>";
 
     private static final int DESCR_MAX_LENGTH = 117;
 
@@ -85,45 +74,33 @@ public class FileProcessor{
      * @return Array of 2 Strings: long and short versions
      */
     private String[] processLink(String text){
-        int len = text.length();
-        boolean foundSharp = false;
-        boolean foundSpace = false;
-        int cut;
-        for(cut=0;cut<len;cut++){
-            char ch = text.charAt(cut);
-            if (ch == '#'){
-                foundSharp = true;
-                break;
-            }else if(Character.isWhitespace(ch)){
-                foundSpace = true;
-                break;
-            }
-        }
-        
-        String cls = (foundSharp || foundSpace)?text.substring(0,cut):text;
-        String attr = (foundSharp || foundSpace)?text.substring(cut+1):"";
-
+        StringUtils.ClsAttrName res = StringUtils.processLink(text);
         String longText, shortText;
-        if (foundSharp){
-            if (cls.isEmpty()){
-                longText = MessageFormat.format(
-                        MEMBER_REFERENCE_TPL, className, attr);
-                shortText = attr;
-            }else{
-                longText = MessageFormat.format(
-                        CLASS_AND_MEMBER_REFERENCE_TPL, cls, attr);
-                shortText = 
-                        MessageFormat.format(
-                                CLASS_AND_MEMBER_REFERENCE_TPL_SHORT,
-                                    cls, attr);
-            }
-        }else if(foundSpace){
-            longText = MessageFormat.format(
-                    CLASS_REFERENCE_RENAMED_TPL, cls, attr);
-            shortText = attr;
+        if (res.attr.isEmpty()){
+           // class reference
+            String cls = res.cls;
+            String name = res.name.isEmpty()?res.cls:res.name;
+            longText =
+                    MessageFormat.format(CLASS_REFERENCE_TPL, cls, name);
+            shortText = name;
         }else{
-            longText = MessageFormat.format(CLASS_REFERENCE_TPL, cls);
-            shortText = cls;
+           // attribute reference
+            String cls = res.cls.isEmpty()?className:res.cls;
+            String attr = res.attr;
+            String name;
+            if (res.name.isEmpty()){
+                if (res.cls.isEmpty()){
+                    name = res.attr;
+                }else{
+                    name = cls + '.' + res.attr;
+                }
+            }else{
+                name = res.name;
+            }
+            longText =
+                    MessageFormat.format(
+                            MEMBER_REFERENCE_TPL, cls, attr, name);
+            shortText = name;
         }
         return new String[]{longText, shortText};
     }
