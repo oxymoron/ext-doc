@@ -64,14 +64,10 @@ public class Comment {
 
             private boolean isStarWhite(char ch){
                   return Character.isWhitespace(ch) || ch=='*';
-            }            
+            }
 
-            /**
-             * Processes inner comment text
-             * Very similar to Sun's com.sun.tools.javadoc#Comment             
-             */
-            void parseCommentStateMacine(){
-                    CommentState state = CommentState.SPACE;
+            private String removeStars(){
+                   CommentState state = CommentState.SPACE;
                     StringBuilder buffer = new StringBuilder();
                     StringBuilder spaceBuffer = new StringBuilder();
                     boolean foundStar = false;
@@ -101,14 +97,20 @@ public class Comment {
                                 break;
                         }
                     }
+                    return buffer.toString();                
+            }
 
+            /**
+             * Processes inner comment text
+             * Very similar to Sun's com.sun.tools.javadoc#Comment             
+             */
+            void parseCommentStateMacine(){                    
+                    String inner = removeStars();
                     InnerState instate = InnerState.TAG_GAP;
-                    String inner = buffer.toString();
-
                     String tagName = null;
                     int tagStart =0;
                     int textStart =0;
-                    boolean newLine = true;
+                    boolean validTag = true;
                     int lastNonWhite = -1;
                     int len = inner.length();
                     for(int i=0;i<len;i++){
@@ -129,19 +131,17 @@ public class Comment {
                                 instate = InnerState.IN_TEXT;
                                 /* fall through */
                             case IN_TEXT:
-                                if (newLine && ch == '@'){
+                                if (validTag && ch == '@'){
                                     parseCommentComponent(inner, tagName,
                                             textStart,lastNonWhite+1);
                                     tagStart = i;
                                     instate = InnerState.TAG_NAME;
                                 }
                                 break;
-                        }
-                        if (ch == '\n'){
-                            newLine = true;
-                        }else if(!isWhite){
-                            lastNonWhite = i;
-                            newLine = false;
+                        }                        
+                        validTag = isWhite;
+                        if(!isWhite){
+                            lastNonWhite = i;                            
                         }
                     }
                     // Finish for last item
