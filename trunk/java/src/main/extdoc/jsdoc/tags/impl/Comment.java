@@ -104,7 +104,7 @@ public class Comment {
              * Processes inner comment text
              * Very similar to Sun's com.sun.tools.javadoc#Comment             
              */
-            void parseCommentStateMacine(){                    
+            void parseCommentStateMachine(){                    
                     String inner = removeStars();
                     InnerState instate = InnerState.TAG_GAP;
                     String tagName = null;
@@ -195,7 +195,7 @@ public class Comment {
             }
             
         }
-        new CommentStringParser().parseCommentStateMacine();
+        new CommentStringParser().parseCommentStateMachine();
 
     }
 
