@@ -453,6 +453,26 @@ public class FileProcessor{
         events.add(event);
     }
 
+    enum CommentType{
+        CLASS, CFG, PROPERTY, METHOD, EVENT}
+
+    static CommentType resolveCommentType(Comment comment){
+        if(comment.hasTag("@class")){
+            return CommentType.CLASS;
+        }else if(comment.hasTag("@event")){
+            return CommentType.EVENT;
+        }else if(comment.hasTag("@cfg")){
+            return CommentType.CFG;
+        }else if(comment.hasTag("@param")
+                || comment.hasTag("@return")
+                || comment.hasTag("@method")){
+            return CommentType.METHOD;
+        }else{
+            return CommentType.PROPERTY;
+        }
+    }
+
+
     /**
      *  Determine type of comment and process it
      * @param content text inside / ** and * /
@@ -461,19 +481,23 @@ public class FileProcessor{
     private void processComment(String content, String extraLine){
         if (content==null) return;
         Comment comment = new Comment(content);
-        if(comment.hasTag("@class")){
-            processClass(comment);
-        }else if(comment.hasTag("@event")){
-            processEvent(comment);
-        }else if(comment.hasTag("@cfg")){
-            processCfg(comment);
-        }else if(comment.hasTag("@property")
-                || comment.hasTag("@type")){
-            processProperty(comment, extraLine);        
-        }else{
-            processMethod(comment, extraLine);            
+        switch (resolveCommentType(comment)){
+            case CLASS:
+                processClass(comment);
+                break;
+            case CFG:
+                processCfg(comment);
+                break;
+            case PROPERTY:
+                processProperty(comment, extraLine);
+                break;
+            case METHOD:
+                processMethod(comment, extraLine);
+                break;
+            case EVENT:
+                processEvent(comment);
+                break;
         }
-        
     }
 
     private enum State {CODE, COMMENT}
