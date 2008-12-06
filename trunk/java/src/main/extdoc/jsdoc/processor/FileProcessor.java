@@ -71,25 +71,40 @@ public class FileProcessor{
             "<a href=\"output/{0}.html\" " +
                     "ext:cls=\"{0}\">{0}</a>";
 
+    private static final String
+               CLASS_REFERENCE_RENAMED_TPL =
+               "<a href=\"output/{0}.html\" " +
+                       "ext:cls=\"{0}\">{1}</a>";
+
+
     private static final int DESCR_MAX_LENGTH = 117;
-    
+
+    /**
+     * Processes link content (between "{" and "}")
+     * @param text Content, ex: "Ext.DomQuery#select"
+     * @return Array of 2 Strings: long and short versions
+     */
     private String[] processLink(String text){
         int len = text.length();
-        boolean found = false;
+        boolean foundSharp = false;
+        boolean foundSpace = false;
         int cut;
         for(cut=0;cut<len;cut++){
             char ch = text.charAt(cut);
-            if (ch == '#' || Character.isWhitespace(ch)){
-                found = true;
+            if (ch == '#'){
+                foundSharp = true;
+                break;
+            }else if(Character.isWhitespace(ch)){
+                foundSpace = true;
                 break;
             }
         }
         
-        String cls = found?text.substring(0,cut):text;
-        String attr = found?text.substring(cut+1):"";
+        String cls = (foundSharp || foundSpace)?text.substring(0,cut):text;
+        String attr = (foundSharp || foundSpace)?text.substring(cut+1):"";
 
         String longText, shortText;
-        if (found){
+        if (foundSharp){
             if (cls.isEmpty()){
                 longText = MessageFormat.format(
                         MEMBER_REFERENCE_TPL, className, attr);
@@ -102,6 +117,10 @@ public class FileProcessor{
                                 CLASS_AND_MEMBER_REFERENCE_TPL_SHORT,
                                     cls, attr);
             }
+        }else if(foundSpace){
+            longText = MessageFormat.format(
+                    CLASS_REFERENCE_RENAMED_TPL, cls, attr);
+            shortText = attr;
         }else{
             longText = MessageFormat.format(CLASS_REFERENCE_TPL, cls);
             shortText = cls;
