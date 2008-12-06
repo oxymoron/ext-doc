@@ -331,9 +331,7 @@ public class FileProcessor{
                 || comment.hasTag("@ignore")) return;
         CfgTag tag = comment.tag("@cfg");
         DocCfg cfg = getDocCfg(tag);
-        cfg.hide = comment.tag("@hide")!=null
-                || (cfg.description!=null 
-                    && cfg.description.longDescr.startsWith("@hide"));
+        cfg.hide = comment.tag("@hide")!=null;
         cfgs.add(cfg);
     }
 
