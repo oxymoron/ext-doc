@@ -74,7 +74,7 @@
                                 <xsl:if test="description/hasShort='true'">expandable</xsl:if>
                             </xsl:variable>
                             <tr class="config-row {$cls} {$inherited}">
-                                <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                <td class="micon"><a href="#expand" class="exi">&nbsp;</a></td>
                                 <td class="sig">
                                     <a id="{className}-{name}"/>
                                     <b><xsl:value-of select="name"/></b> : <xsl:value-of select="type"/>
@@ -116,7 +116,7 @@
                                     <xsl:if test="description/hasShort='true'">expandable</xsl:if>
                                 </xsl:variable>
                                 <tr class="property-row {$cls} {$inherited}">
-                                    <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                    <td class="micon"><a href="#expand" class="exi">&nbsp;</a></td>
                                     <td class="sig">
                                         <a id="{className}-{name}"/>
                                         <b><xsl:value-of select="name"/></b> : <xsl:value-of select="type"/>
@@ -160,7 +160,7 @@
                                     <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                                 </xsl:variable>
                                 <tr class="method-row expandable {$inherited}">
-                                    <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                    <td class="micon"><a href="#expand" class="exi">&nbsp;</a></td>
                                     <td class="sig">
                                         <a id="{className}-{name}"/>
                                         <b><xsl:value-of select="name"/></b>
@@ -208,7 +208,7 @@
                                 <xsl:if test="/docClass/className!=className">inherited</xsl:if>
                               </xsl:variable>
                               <tr class="method-row expandable {$inherited}">
-                                  <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+                                  <td class="micon"><a href="#expand" class="exi">&nbsp;</a></td>
                                   <td class="sig">
                                       <a id="{className}-{name}"/>
                                       <b><xsl:value-of select="name"/></b> :
