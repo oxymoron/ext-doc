@@ -44,7 +44,7 @@ public class FileProcessor{
     private TreePackage tree = new TreePackage();
 
     private final static String OUT_FILE_EXTENSION = "html";
-    private final static boolean GENERATE_DEBUG_XML = true;
+    private final static boolean GENERATE_DEBUG_XML = false;
     private final static String COMPONENT_NAME =
             "Ext.Component";
 
@@ -107,20 +107,21 @@ public class FileProcessor{
 
     private Description inlineLinks(String content){
         return inlineLinks(content, false);
-    }
+    }    
 
     /**
      * Replaces inline tag @link to actual html links and returns shot and/or
      *  long versions.
-     * @param content description content
+     * @param cnt description content
      * @param alwaysGenerateShort forces to generate short version for
      * Methods and events
      * @return short and long versions
      */
-    private Description inlineLinks(String content,
+    private Description inlineLinks(String cnt,
                                                                 boolean alwaysGenerateShort){
 
-        if (content==null) return null;
+        if (cnt==null) return null;
+        String content = StringUtils.highlightCode(cnt);
         LinkStates state = LinkStates.READ;
         StringBuilder sbHtml = new StringBuilder();
         StringBuilder sbText = new StringBuilder();
@@ -129,7 +130,7 @@ public class FileProcessor{
             char ch = content.charAt(i);
             switch (state){
                 case READ:
-                    if (endsWith(buffer, START_LINK)){
+                    if (StringUtils.endsWith(buffer, START_LINK)){
                         String substr = buffer.substring(
                                             0, buffer.length() - START_LINK.length());
                         sbHtml.append(substr);
@@ -203,56 +204,7 @@ public class FileProcessor{
     }
 
 
-    /**
-     * Separates fullclass name to package and class
-     * By this rule:
-     * Ext => pkg: "" cls: "Ext"
-     * Ext.Button => pkg: "Ext" cls: "Button"
-     * Ext.util.Observable => pkg: "Ext.util" cls: "Observable"
-     * Ext.layout.BorderLayout.Region => pkg: "Ext.layout" cls: "BorderLayout.Region"
-     * Ext.Updater.BasicRenderer => pkg: "Ext" cls: "Updater.BasicRenderer"
-     * @param className Class name to parse
-     * @return Array of strings [0] package [1] class
-     */
-    private String[] separatePackage(String className){
-        String [] str = new String[2];
-        String[] items = className.split("\\.");
-        if (items.length == 1){
-            str[0] = "";
-            str[1] = className;
-        }else{
-            StringBuilder pkg = new StringBuilder(items[0]);
-            StringBuilder cls = new StringBuilder(items[items.length - 1]);
-            for(int i=items.length-2;i>0;i--){
-                if (Character.isUpperCase(items[i].charAt(0))){
-                    // if starts with capital it is a part of class name
-                    cls.insert(0, '.');
-                    cls.insert(0, items[i]);
-                }else{
-                    // insert remaining package name
-                    for(int j =1;j<=i;j++){
-                        pkg.append('.');
-                        pkg.append(items[j]);
-                    }
-                    break;
-                }
-            }
-            str[0] = pkg.toString();
-            str[1] = cls.toString();
-        }
-        return str;
-    }
-
-    private String[] separateByLastDot(String className){
-        String[] str = new String[2];
-        if(className==null) return str;
-        int len = className.length();
-        int i = len-1;
-        while(i>=0 && className.charAt(i)!='.') i--;
-        str[0] = (i>0)?className.substring(0,i):"";
-        str[1] = className.substring(i+1,len);
-        return str;
-    }
+   
 
     /**
      * Process class 
@@ -269,7 +221,7 @@ public class FileProcessor{
         List<ParamTag> paramTags = comment.tags("@param");
 
         cls.className = classTag.getClassName();
-        String[] str = separatePackage(cls.className);
+        String[] str = StringUtils.separatePackage(cls.className);
         cls.packageName = str[0];
         cls.shortClassName = str[1];
         cls.definedIn = currFile;
@@ -351,7 +303,7 @@ public class FileProcessor{
         PropertyTag propertyTag = comment.tag("@property");
         TypeTag typeTag = comment.tag("@type");
 
-        property.name = separateByLastDot(extraLine)[1];
+        property.name = StringUtils.separateByLastDot(extraLine)[1];
         String description = comment.getDescription();
         if (propertyTag!=null){
             String propertyName = propertyTag.getPropertyName();
@@ -393,7 +345,7 @@ public class FileProcessor{
         // should be first because @member may redefine class
         method.className = className;
         method.shortClassName = shortClassName;
-        method.name = separatePackage(extraLine)[1];
+        method.name = StringUtils.separatePackage(extraLine)[1];
         if (methodTag!=null){
             if (!methodTag.text().isEmpty()){
                 method.name = methodTag.text();
@@ -406,7 +358,7 @@ public class FileProcessor{
             }
             method.className = memberTag.getClassName();
             method.shortClassName =
-                    separatePackage(method.className)[1];            
+                    StringUtils.separatePackage(method.className)[1];
         }
         method.isStatic = (staticTag!=null);
 
@@ -504,14 +456,6 @@ public class FileProcessor{
     private static final String START_COMMENT = "/**";
     private static final String END_COMMENT = "*/";
 
-    /**
-     * Checks if StringBuilder ends with string
-     */
-    private boolean endsWith(StringBuilder sb, String str){
-        int len = sb.length();
-        int strLen = str.length();        
-        return (len>=strLen && sb.substring(len-strLen).equals(str));
-    }
 
     /**
      * Checks if char is white space in terms of extra line of code after
@@ -564,7 +508,7 @@ public class FileProcessor{
                                 extraBuffer.append(ch);
                                 break;
                         }                                            
-                        if (endsWith(buffer, START_COMMENT)){
+                        if (StringUtils.endsWith(buffer, START_COMMENT)){
                             if (comment!=null){
                                 // comment is null before the first comment starts
                                 // so we do not process it
@@ -576,7 +520,7 @@ public class FileProcessor{
                         }
                         break;
                     case COMMENT:
-                       if (endsWith(buffer, END_COMMENT)){
+                       if (StringUtils.endsWith(buffer, END_COMMENT)){
                             comment =
                                     buffer.substring(0,
                                             buffer.length()-END_COMMENT.length());
@@ -632,8 +576,8 @@ public class FileProcessor{
                                                           List<T> docs){
         if (doc.name == null || doc.name.isEmpty()) return false;
         for(DocAttribute attr:docs){
-            String docName = separateByLastDot(doc.name)[1];
-            String attrName = separateByLastDot(attr.name)[1];
+            String docName = StringUtils.separateByLastDot(doc.name)[1];
+            String attrName = StringUtils.separateByLastDot(attr.name)[1];
             if (docName.equals(attrName)) return true;
         }
         return false;
