@@ -48,6 +48,15 @@ public class FileProcessorTest {
     }
 
     @Test
+    public void testCommentTypePropertySimpleMethod(){
+        String test = " The normal browser event ";
+        FileProcessor.CommentType commentType =
+                FileProcessor.resolveCommentType(new Comment(test), "", "function");
+        assertEquals(FileProcessor.CommentType.METHOD, commentType);
+    }
+
+
+    @Test
     public void testCommentTypeMethod(){
         String test =
                 "        * Returns the current HTML document object as an {@link Ext.Element}.\n" +
@@ -70,5 +79,7 @@ public class FileProcessorTest {
                 FileProcessor.resolveCommentType(new Comment(test));
         assertEquals(FileProcessor.CommentType.EVENT, commentType);
     }
+
+
 
 }
