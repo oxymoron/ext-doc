@@ -211,7 +211,7 @@
                                   <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
                                   <td class="sig">
                                       <a id="{className}-{name}"/>
-                                      <b><xsl:value-of select="name"/></b>
+                                      <b><xsl:value-of select="name"/></b> :
                                       <xsl:call-template name="method-params"/>
                                       <div class="mdesc">
                                           <div class="short"><xsl:value-of select="description/shortDescr"/></div>
