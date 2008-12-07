@@ -12,5 +12,4 @@ public class DocMethod extends DocAttribute{
     public List<Param> params = new ArrayList <Param>();
     public String returnType;
     public String returnDescription;
-    public boolean isStatic;
 }
