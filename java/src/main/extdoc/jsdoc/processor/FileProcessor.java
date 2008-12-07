@@ -408,6 +408,10 @@ public class FileProcessor{
         CLASS, CFG, PROPERTY, METHOD, EVENT}
 
     static CommentType resolveCommentType(Comment comment){
+        return resolveCommentType(comment, "", "");
+    }
+
+    static CommentType resolveCommentType(Comment comment, String extraLine, String extra2Line){
         if(comment.hasTag("@class")){
             return CommentType.CLASS;
         }else if(comment.hasTag("@event")){
@@ -416,7 +420,8 @@ public class FileProcessor{
             return CommentType.CFG;
         }else if(comment.hasTag("@param")
                 || comment.hasTag("@return")
-                || comment.hasTag("@method")){
+                || comment.hasTag("@method")
+                || extra2Line.equals("function")){
             return CommentType.METHOD;
         }else{
             return CommentType.PROPERTY;
@@ -429,10 +434,10 @@ public class FileProcessor{
      * @param content text inside / ** and * /
      * @param extraLine first word form the line after comment 
      */
-    private void processComment(String content, String extraLine){
+    private void processComment(String content, String extraLine, String extra2Line){
         if (content==null) return;
         Comment comment = new Comment(content);
-        switch (resolveCommentType(comment)){
+        switch (resolveCommentType(comment, extraLine, extra2Line)){
             case CLASS:
                 processClass(comment);
                 break;
@@ -452,7 +457,7 @@ public class FileProcessor{
     }
 
     private enum State {CODE, COMMENT}
-    private enum ExtraState {SKIP, SPACE, READ}   
+    private enum ExtraState {SKIP, SPACE, READ, SPACE2, READ2}
 
     private static final String START_COMMENT = "/**";
     private static final String END_COMMENT = "*/";
@@ -485,6 +490,7 @@ public class FileProcessor{
             ExtraState extraState = ExtraState.SKIP;            
             StringBuilder buffer = new StringBuilder();
             StringBuilder extraBuffer = new StringBuilder();            
+            StringBuilder extra2Buffer = new StringBuilder();
             String comment=null;
             char ch;
             while((numRead=reader.read())!=-1){
@@ -503,19 +509,34 @@ public class FileProcessor{
                                 /* fall through */
                             case READ:
                                 if (isWhite(ch)){
-                                    extraState = ExtraState.SKIP;
+                                    extraState = ExtraState.SPACE2;
                                     break;
                                 }
                                 extraBuffer.append(ch);
+                                break;
+                            case SPACE2:
+                                if (isWhite(ch)){
+                                    break;
+                                }
+                                extraState = ExtraState.READ2;
+                                /* fall through */
+                            case READ2:
+                                if (isWhite(ch)){
+                                    extraState = ExtraState.SKIP;
+                                    break;
+                                }
+                                extra2Buffer.append(ch);
                                 break;
                         }                                            
                         if (StringUtils.endsWith(buffer, START_COMMENT)){
                             if (comment!=null){
                                 // comment is null before the first comment starts
                                 // so we do not process it
-                                processComment(comment, extraBuffer.toString());
+                                processComment(comment,
+                                        extraBuffer.toString(), extra2Buffer.toString());
                             }
                             extraBuffer.setLength(0);
+                            extra2Buffer.setLength(0);
                             buffer.setLength(0);
                             state = State.COMMENT;
                         }
@@ -532,7 +553,8 @@ public class FileProcessor{
                         break;
                 }
             }
-            processComment(comment, extraBuffer.toString());
+            processComment(comment,
+                    extraBuffer.toString(), extra2Buffer.toString());
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
