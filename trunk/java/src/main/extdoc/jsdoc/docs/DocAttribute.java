@@ -11,6 +11,7 @@ public abstract class DocAttribute implements Comparable<DocAttribute>{
     public String className;
     public String shortClassName;
     public boolean hide;
+    public boolean isStatic; 
 
     public  int compareTo(DocAttribute anotherAttribute) {
         return name.compareTo(anotherAttribute.name);

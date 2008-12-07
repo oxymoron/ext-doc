@@ -595,7 +595,7 @@ public class FileProcessor{
     private <T extends DocAttribute> void addInherited
                                                     (List<T> childDocs, List<T> parentDocs){
         for(T attr: parentDocs) {
-            if (!isOverridden(attr, childDocs)){
+            if (!isOverridden(attr, childDocs) && !attr.isStatic){
                 childDocs.add(attr);
             }
         }
