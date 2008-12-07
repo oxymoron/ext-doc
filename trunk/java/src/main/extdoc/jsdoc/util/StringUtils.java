@@ -217,7 +217,7 @@ public class StringUtils {
     public static String highlightCode(String str){
         return processTokens(str, "<code>", "</code>", new TokenHandler(){
             protected String handle(String content){
-                return highlight(content);                
+                return highlight(content.trim());                
             }
         });              
     }
