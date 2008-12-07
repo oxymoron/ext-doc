@@ -269,7 +269,7 @@
 
     <xsl:template name="constructor">
        <tr class="method-row expandable">
-            <td class="micon"><a href="#expand" class="exi"/>&nbsp;</td>
+            <td class="micon"><a href="#expand" class="exi">&nbsp;</a></td>
             <td class="sig">
                 <a id="{className}-{shortClassName}"/>
                 <b><xsl:value-of select="shortClassName"/></b>
