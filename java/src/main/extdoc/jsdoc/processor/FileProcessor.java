@@ -420,8 +420,12 @@ public class FileProcessor{
             return CommentType.CFG;
         }else if(comment.hasTag("@param")
                 || comment.hasTag("@return")
-                || comment.hasTag("@method")
-                || extra2Line.equals("function")){
+                || comment.hasTag("@method")){
+            return CommentType.METHOD;
+        }else if (comment.hasTag("@type")
+                || comment.hasTag("@property")){
+            return CommentType.PROPERTY;                    
+        }else if(extra2Line.equals("function")){
             return CommentType.METHOD;
         }else{
             return CommentType.PROPERTY;
