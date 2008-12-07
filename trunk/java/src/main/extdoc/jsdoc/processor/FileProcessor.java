@@ -47,6 +47,7 @@ public class FileProcessor{
     private final static boolean GENERATE_DEBUG_XML = false;
     private final static String COMPONENT_NAME =
             "Ext.Component";
+    private final static String DEFAULT_TYPE = "Object";
 
     private String className;
     private String shortClassName;
@@ -315,7 +316,7 @@ public class FileProcessor{
                 description = propertyDescription;
             }
         }
-        property.type = typeTag!=null?typeTag.getType():null;
+        property.type = typeTag!=null?typeTag.getType():DEFAULT_TYPE;
         property.description = inlineLinks(description);
         property.className = className;
         property.shortClassName = shortClassName;
