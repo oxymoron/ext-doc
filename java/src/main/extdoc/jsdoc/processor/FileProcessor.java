@@ -220,11 +220,17 @@ public class FileProcessor{
         ExtendsTag extendsTag = comment.tag("@extends");
         Tag constructorTag = comment.tag("@constructor");
         List<ParamTag> paramTags = comment.tags("@param");
+        Tag namespaceTag = comment.tag("@namespace");
 
         cls.className = classTag.getClassName();
-        String[] str = StringUtils.separatePackage(cls.className);
-        cls.packageName = str[0];
-        cls.shortClassName = str[1];
+        if (namespaceTag!=null){
+            cls.packageName = namespaceTag.text();
+            cls.shortClassName = StringUtils.separateByLastDot(cls.className)[1];
+        }else{
+            String[] str = StringUtils.separatePackage(cls.className);
+            cls.packageName = str[0];
+            cls.shortClassName = str[1];
+        }
         cls.definedIn = currFile;
         cls.singleton = singletonTag!=null;
         String description = classTag.getClassDescription();
@@ -707,6 +713,9 @@ public class FileProcessor{
      private void copyDirectory(File sourceLocation , File targetLocation)
         throws IOException {
 
+        // skip hidden
+        if (sourceLocation.isHidden()) return;
+         
         if (sourceLocation.isDirectory()) {
             if (!targetLocation.exists()) {
                 targetLocation.mkdir();
