@@ -20,7 +20,7 @@
 
 	<xsl:template match="treePackage|packages">
 		<xsl:for-each select="packages">
-                {"id":"pkg-<xsl:value-of select="@name"/>","text":"<xsl:value-of select="@name"/>","iconCls":"icon-pkg","cls":"package","singleClickExpand":true, children:[<xsl:apply-templates select="."/>]}
+                {"id":"pkg-<xsl:value-of select="@fullName"/>","text":"<xsl:value-of select="@name"/>","iconCls":"icon-pkg","cls":"package","singleClickExpand":true, children:[<xsl:apply-templates select="."/>]}
 				<xsl:if test="position()!=last()">,</xsl:if>
 			</xsl:for-each>
 			<xsl:if test="count(packages)!=0 and count(classes)!=0">,</xsl:if>

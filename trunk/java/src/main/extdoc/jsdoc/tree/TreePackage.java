@@ -19,6 +19,9 @@ public class TreePackage implements Comparable<TreePackage>{
     @XmlAttribute
     public String name;
 
+    @XmlAttribute
+    public String fullName;
+
     public List<TreePackage> packages =
         new ArrayList<TreePackage>();
 
@@ -29,7 +32,7 @@ public class TreePackage implements Comparable<TreePackage>{
         addClass(docClass.packageName, docClass);
     }
 
-    public void addClass(String packageName, DocClass docClass){        
+    public void addClass(String packageName, DocClass docClass){
         if (packageName.equals("")){
             TreeClass treeClass = new TreeClass();
             treeClass.className = docClass.className;
@@ -60,6 +63,11 @@ public class TreePackage implements Comparable<TreePackage>{
         }
         TreePackage p = new TreePackage();
         p.name = packageName;
+        if (fullName!=null){
+            p.fullName = fullName + '.' + packageName;
+        }else{
+            p.fullName = packageName;
+        }
         packages.add(p);
         return p;
     }
