@@ -209,4 +209,9 @@
           <!--<file src="other/sample.js" />-->
 
     </source>
+    <tags>
+        <tag name="author" title="Author"/>
+        <tag name="version" title="Class Version"/>
+        <tag name="note" format="&lt;i&gt;NOTE: {0}&lt;/i&gt;"/>
+    </tags>
 </doc>

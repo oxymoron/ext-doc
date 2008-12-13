@@ -5,7 +5,8 @@ package extdoc.jsdoc.docs;
  * Date: 03.11.2008
  * Time: 2:23:50
  */
-public abstract class DocAttribute implements Comparable<DocAttribute>{
+public abstract class DocAttribute extends Doc
+                                        implements Comparable<DocAttribute>{
     public String name;
     public Description description;
     public String className;

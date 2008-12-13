@@ -12,7 +12,7 @@ import java.util.List;
  */
 
 @XmlRootElement
-public class DocClass{
+public class DocClass extends Doc{
     public String className;
     public String shortClassName;
     public String packageName;

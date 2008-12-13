@@ -49,6 +49,7 @@
                         </xsl:choose>
                     </td>
                 </tr>
+                <xsl:call-template name="class-custom-tags"/>    
             </table>
             <div class="description">
                 <xsl:value-of select="description" disable-output-escaping="yes"/>
@@ -82,9 +83,9 @@
                                             <xsl:choose>
                                                 <xsl:when test="description/hasShort='true'">
                                                     <div class="short"><xsl:value-of select="description/shortDescr"/></div>
-                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></div>
+                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/><xsl:call-template name="custom-tags"/></div>
                                                 </xsl:when>
-                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></xsl:otherwise>
+                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/><xsl:call-template name="custom-tags"/></xsl:otherwise>
                                             </xsl:choose>
                                     </div>
                                 </td>
@@ -124,9 +125,9 @@
                                             <xsl:choose>
                                                 <xsl:when test="description/hasShort='true'">
                                                     <div class="short"><xsl:value-of select="description/shortDescr"/></div>
-                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></div>
+                                                    <div class="long"><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/><xsl:call-template name="custom-tags"/></div>
                                                 </xsl:when>
-                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/></xsl:otherwise>
+                                                <xsl:otherwise><xsl:value-of select="description/longDescr" disable-output-escaping="yes"/><xsl:call-template name="custom-tags"/></xsl:otherwise>
                                             </xsl:choose>
                                         </div>
                                     </td>
@@ -178,6 +179,7 @@
                                                 <xsl:call-template name="check-if-static"/>
                                                 <xsl:value-of select="description/longDescr" disable-output-escaping="yes"/>
                                                 <xsl:call-template name="method-params-details"/>
+                                                <xsl:call-template name="custom-tags"/>
                                             </div>
                                         </div>
                                     </td>
@@ -233,6 +235,7 @@
                                                       </xsl:for-each>
                                                   </ul>
                                               </div>
+                                              <xsl:call-template name="custom-tags"/>
                                           </div>
                                       </div>
                                   </td>
@@ -279,6 +282,7 @@
                     <div class="long">
                         <xsl:value-of select="constructorDescription/longDescr" disable-output-escaping="yes"/>
                         <xsl:call-template name="method-params-details"/>
+                        <xsl:call-template name="custom-tags"/>
                     </div>
                 </div>
             </td>
@@ -372,6 +376,25 @@
                 </xsl:for-each>
             </td>
         </tr>
+    </xsl:template>
+
+    <xsl:template name="class-custom-tags">
+        <xsl:if test="customTags">
+            <xsl:for-each select="customTags">
+            <tr>
+                <td class="label"><xsl:value-of select="title"/>:</td>
+                <td class="hd-info"><xsl:value-of select="value"/></td>
+            </tr>
+            </xsl:for-each>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="custom-tags">
+        <xsl:if test="customTags">
+            <xsl:for-each select="customTags">
+                <xsl:value-of select="value" disable-output-escaping="yes"/>
+            </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>
