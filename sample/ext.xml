@@ -164,6 +164,49 @@
         <file src="ext/air/src/NativeDD.js" />
         <file src="ext/air/src/Sound.js" />
         <file src="ext/air/src/SystemMenu.js" />
+        <file src="sample.js" />
+
+          <!--<file src="ux/api/gMap.js" />-->
+
+          <!--<file src="ux/Element/Print.js" />-->
+
+          <!--<file src="ux/event/Broadcast.js" />-->
+
+          <!--<file src="ux/form/BotField.js" />-->
+
+          <!--<file src="ux/grid/filter/BooleanFilter.js" />-->
+          <!--<file src="ux/grid/filter/DateFilter.js" />-->
+          <!--<file src="ux/grid/filter/Filter.js" />-->
+          <!--<file src="ux/grid/filter/ListFilter.js" />-->
+          <!--<file src="ux/grid/filter/NumericFilter.js" />-->
+          <!--<file src="ux/grid/filter/StringFilter.js" />-->
+
+          <!--<file src="ux/grid/GridFilters.js" />-->
+
+          <!--<file src="ux/layout/Carousel.js" />-->
+          <!--<file src="ux/layout/RowFitLayout.js" />-->
+          <!--<file src="ux/layout/Template.js" />-->
+
+          <!--<file src="ux/menu/EditableItem.js" />-->
+          <!--<file src="ux/menu/ListMenu.js" />-->
+          <!--<file src="ux/menu/RangeMenu.js" />-->
+          <!--<file src="ux/menu/TreeMenu.js" />-->
+
+          <!--<file src="ux/panel/GMapPanel.js" />-->
+          <!--<file src="ux/panel/MenuPanel.js" />-->
+
+          <!--<file src="ux/reference/Slot.js" />-->
+
+          <!--<file src="ux/window/MessageWindow.js" />-->
+
+          <!--<file src="ux/Wiz/Card.js" />-->
+          <!--<file src="ux/Wiz/Header.js" />-->
+
+          <!--<file src="ux/ErrorHandler.js" />-->
+          <!--<file src="ux/Sound.js" />-->
+          <!--<file src="ux/Wiz.js" />-->
+
+          <!--<file src="other/sample.js" />-->
 
     </source>
 </doc>
