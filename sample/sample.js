@@ -7,6 +7,9 @@ Ext.namespace("SamplePackage");
 /**
  * @class SamplePackage.SampleClass
  * @extends Ext.Panel
+ * This is a sample class
+ * @author oxymoron
+ * @version 1.0.101 
  */
 SamplePackage.SampleClass = Ext.extend(Ext.Panel, {
 
@@ -50,6 +53,7 @@ SamplePackage.SampleClass = Ext.extend(Ext.Panel, {
          * @param {String} param1 Parameter name
          * @param {String} param2 (Optional) Optional parameter
          * @return {Number} Return value
+         * @note This is a custom tag supported since version 1.0.101
          */
         this.methodTwo = function(){};
 

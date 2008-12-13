@@ -43,6 +43,9 @@ public class FileProcessor{
 
     private TreePackage tree = new TreePackage();
 
+    private List<extdoc.jsdoc.schema.Tag> customTags
+                = new ArrayList<extdoc.jsdoc.schema.Tag>(); 
+
     private final static String OUT_FILE_EXTENSION = "html";
     private final static boolean GENERATE_DEBUG_XML = false;
     private final static String COMPONENT_NAME =
@@ -204,7 +207,20 @@ public class FileProcessor{
         }
     }
 
-
+    private void injectCustomTags(Doc doc, Comment comment){
+        for(extdoc.jsdoc.schema.Tag customTag: customTags){
+            Tag tag = comment.tag('@' + customTag.getName());
+            if(tag!=null){
+                DocCustomTag t = new DocCustomTag();
+                String title = customTag.getTitle();
+                String format = customTag.getFormat();
+                t.title = title;
+                t.value = format!=null?
+                        MessageFormat.format(format, tag.text()):tag.text();
+                doc.customTags.add(t);
+            }
+        }
+    }
    
 
     /**
@@ -262,7 +278,8 @@ public class FileProcessor{
             DocCfg cfg = getDocCfg(innerCfg);
             cfgs.add(cfg);
         }
-        
+
+        injectCustomTags(cls, comment);
     }
 
     /**
@@ -291,6 +308,7 @@ public class FileProcessor{
         CfgTag tag = comment.tag("@cfg");
         DocCfg cfg = getDocCfg(tag);
         cfg.hide = comment.tag("@hide")!=null;
+        injectCustomTags(cfg, comment);
         cfgs.add(cfg);
     }
 
@@ -327,6 +345,7 @@ public class FileProcessor{
         property.className = className;
         property.shortClassName = shortClassName;
         property.hide = comment.tag("@hide")!=null;
+        injectCustomTags(property, comment);
         properties.add(property);
     }
 
@@ -385,6 +404,7 @@ public class FileProcessor{
         }
         readParams(paramTags, method.params);
         method.hide = comment.tag("@hide")!=null;
+        injectCustomTags(method, comment);
         methods.add(method);
     }
 
@@ -407,6 +427,7 @@ public class FileProcessor{
         event.className = className;
         event.shortClassName = shortClassName;
         event.hide = comment.tag("@hide")!=null;
+        injectCustomTags(event, comment);
         events.add(event);
     }
 
@@ -693,6 +714,7 @@ public class FileProcessor{
                     (extdoc.jsdoc.schema.Doc) unmarshaller.
                             unmarshal(fileInputStream);
             extdoc.jsdoc.schema.Source source = doc.getSource();
+            customTags = doc.getTags().getTag();
             List<extdoc.jsdoc.schema.File> files = source.getFile();
             for(extdoc.jsdoc.schema.File file: files){
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
