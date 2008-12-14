@@ -11,7 +11,6 @@ public abstract class DocAttribute extends Doc
     public Description description;
     public String className;
     public String shortClassName;
-    public boolean hide;
     public boolean isStatic; 
 
     public  int compareTo(DocAttribute anotherAttribute) {

@@ -11,7 +11,8 @@
 			<xs:sequence>
 				<xs:element ref="classTemplate"/>
 				<xs:element ref="treeTemplate"/>
-				<xs:element ref="resources"/>
+                <xs:element ref="source"/>
+                <xs:element ref="resources"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -31,6 +32,11 @@
 	<xs:element name="classTemplate">
 		<xs:complexType>
 			<xs:attribute name="tpl" type="xs:string" use="required"/>
+			<xs:attribute name="targetDir" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+    <xs:element name="source">
+		<xs:complexType>
 			<xs:attribute name="targetDir" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
