@@ -759,8 +759,36 @@ public class FileProcessor{
         }
     }
 
-    private void copySourceFiles(String targetDir){
+    private static final String WRAPPER_CODE_MARKER =
+            "###SOURCE###";
+
+    private void readWrapper(String wrapper, StringBuilder prefix,
+                             StringBuilder suffix){
+        try {
+            BufferedReader reader =
+                        new BufferedReader(new FileReader(wrapper));
+            int numRead;
+            while((numRead=reader.read())!=-1 &&
+                    !StringUtils.endsWith(prefix, WRAPPER_CODE_MARKER)){
+                prefix.append((char)numRead);
+            }
+            int len = prefix.length();
+            prefix.delete(len-WRAPPER_CODE_MARKER.length(),len);
+            suffix.append((char)numRead);
+            while((numRead=reader.read())!=-1){
+                suffix.append((char)numRead);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void copySourceFiles(String targetDir, String wrapper){
         new File(targetDir).mkdirs();
+        StringBuilder prefix = new StringBuilder();
+        StringBuilder suffix = new StringBuilder();
+        readWrapper(wrapper, prefix, suffix);
         for(DocFile docFile: context.getDocFiles()){
             try {
                 File dst = new File(new StringBuilder()
@@ -778,17 +806,17 @@ public class FileProcessor{
                 // current doc
                 ListIterator<Doc> it = docFile.docs.listIterator();
                 Doc doc=it.hasNext()?it.next():null;
-                buffer.append("<pre><code>");
+                buffer.append(prefix);
                 while((numRead=reader.read())!=-1){
                     position++;
                     char ch = (char) numRead;
                     if(doc!=null && position==doc.positionInFile){
-                        buffer.append(MessageFormat.format("<span id=\"{0}\"/>", doc.id));
+                        buffer.append(MessageFormat.format("<div id=\"{0}\"></div>", doc.id));
                         doc = it.hasNext()?it.next():null;
                     }
                     buffer.append(ch);
                 }
-                buffer.append("</code></pre>");
+                buffer.append(suffix);
                 Writer out = new BufferedWriter(new FileWriter(dst));
                 out.write(buffer.toString());
                 out.close();
@@ -866,7 +894,9 @@ public class FileProcessor{
                     .toString();
              logger.info(MessageFormat.format("Target folder: {0}",
                      sourceTargetDir));
-            copySourceFiles(sourceTargetDir);
+            String wrapperFile = templateFolder + File.separator +
+                    template.getSource().getWrapper(); 
+            copySourceFiles(sourceTargetDir, wrapperFile);
 
 
 

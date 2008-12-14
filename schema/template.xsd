@@ -38,6 +38,7 @@
     <xs:element name="source">
 		<xs:complexType>
 			<xs:attribute name="targetDir" type="xs:string" use="required"/>
-		</xs:complexType>
+            <xs:attribute name="wrapper" type="xs:string" use="required"/>
+        </xs:complexType>
 	</xs:element>
 </xs:schema>
