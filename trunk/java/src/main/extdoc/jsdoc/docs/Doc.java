@@ -1,5 +1,6 @@
 package extdoc.jsdoc.docs;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,4 +11,10 @@ import java.util.List;
  */
 public abstract class Doc {
     public List<DocCustomTag> customTags = new ArrayList<DocCustomTag>();
+    public boolean hide;
+    @XmlTransient
+    public long positionInFile;
+    @XmlTransient
+    public String id;
+    public String href;
 }

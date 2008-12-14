@@ -2,6 +2,7 @@
 <template>
     <classTemplate tpl="tpl/class.xsl" targetDir="output"/>
     <treeTemplate tpl="tpl/tree.xsl" targetFile="output/tree.js"/>
+    <source targetDir="source"/>
     <resources>
         <copy src="index.html" dst="index.html"/>
         <copy src="welcome.html" dst="welcome.html"/>

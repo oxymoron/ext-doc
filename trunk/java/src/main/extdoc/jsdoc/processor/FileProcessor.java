@@ -4,7 +4,6 @@ import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
 import extdoc.jsdoc.tplschema.*;
-import extdoc.jsdoc.tree.TreePackage;
 import extdoc.jsdoc.util.StringUtils;
 import org.w3c.dom.Document;
 
@@ -21,7 +20,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -34,27 +36,13 @@ public class FileProcessor{
 
     private static Logger logger = Logger.getLogger("extdoc.jsdoc.processor");
 
-    public List<DocClass> classes = new ArrayList<DocClass>();
-    public List<DocCfg> cfgs = new ArrayList<DocCfg>();
-    public List<DocProperty> properties =
-            new ArrayList<DocProperty>();
-    public List<DocMethod> methods = new ArrayList<DocMethod>();
-    public List<DocEvent> events = new ArrayList<DocEvent>();
-
-    private TreePackage tree = new TreePackage();
-
-    private List<extdoc.jsdoc.schema.Tag> customTags
-                = new ArrayList<extdoc.jsdoc.schema.Tag>(); 
+    private Context context = new Context();
 
     private final static String OUT_FILE_EXTENSION = "html";
     private final static boolean GENERATE_DEBUG_XML = false;
     private final static String COMPONENT_NAME =
             "Ext.Component";
     private final static String DEFAULT_TYPE = "Object";
-
-    private String className;
-    private String shortClassName;
-    private String currFile;
 
     private static final String START_LINK = "{@link";    
 
@@ -89,7 +77,8 @@ public class FileProcessor{
             shortText = name;
         }else{
            // attribute reference
-            String cls = res.cls.isEmpty()?className:res.cls;
+            String cls = res.cls.isEmpty()?
+                    context.getCurrentClass().className:res.cls;
             String attr = res.attr;
             String name;
             if (res.name.isEmpty()){
@@ -208,7 +197,7 @@ public class FileProcessor{
     }
 
     private void injectCustomTags(Doc doc, Comment comment){
-        for(extdoc.jsdoc.schema.Tag customTag: customTags){
+        for(extdoc.jsdoc.schema.Tag customTag: context.getCustomTags()){
             Tag tag = comment.tag('@' + customTag.getName());
             if(tag!=null){
                 DocCustomTag t = new DocCustomTag();
@@ -247,7 +236,7 @@ public class FileProcessor{
             cls.packageName = str[0];
             cls.shortClassName = str[1];
         }
-        cls.definedIn = currFile;
+        cls.definedIn = context.getCurrentFile().fileName;
         cls.singleton = singletonTag!=null;
         String description = classTag.getClassDescription();
         if (description==null && extendsTag!=null){
@@ -264,19 +253,19 @@ public class FileProcessor{
         }
 
         // Skip private classes
-        if (!comment.hasTag("@private")
-                && !comment.hasTag("@ignore")) {
-            classes.add(cls);
-        }
-        className = cls.className;
-        shortClassName = cls.shortClassName;
+        if (comment.hasTag("@private")
+                || comment.hasTag("@ignore")) {
+            cls.hide = true;
+
+        }        
+        context.addDocClass(cls);
 
         // Process cfg declared inside class definition
         // goes after global className set
         List<CfgTag> innerCfgs =  comment.tags("@cfg");
         for (CfgTag innerCfg: innerCfgs){
             DocCfg cfg = getDocCfg(innerCfg);
-            cfgs.add(cfg);
+            context.addDocCfg(cfg);
         }
 
         injectCustomTags(cls, comment);
@@ -292,8 +281,9 @@ public class FileProcessor{
         cfg.type = tag.getCfgType();
         cfg.description = inlineLinks(tag.getCfgDescription());
         cfg.optional = tag.isOptional();
-        cfg.className = className;
-        cfg.shortClassName = shortClassName;
+        cfg.className = context.getCurrentClass().className;
+        cfg.shortClassName =
+                context.getCurrentClass().shortClassName;
         return cfg;
     }
 
@@ -309,7 +299,7 @@ public class FileProcessor{
         DocCfg cfg = getDocCfg(tag);
         cfg.hide = comment.tag("@hide")!=null;
         injectCustomTags(cfg, comment);
-        cfgs.add(cfg);
+        context.addDocCfg(cfg);
     }
 
     /**
@@ -342,11 +332,11 @@ public class FileProcessor{
         }
         property.type = typeTag!=null?typeTag.getType():DEFAULT_TYPE;
         property.description = inlineLinks(description);
-        property.className = className;
-        property.shortClassName = shortClassName;
+        property.className = context.getCurrentClass().className;
+        property.shortClassName = context.getCurrentClass().shortClassName;
         property.hide = comment.tag("@hide")!=null;
         injectCustomTags(property, comment);
-        properties.add(property);
+        context.addDocProperty(property);
     }
 
     /**
@@ -369,8 +359,8 @@ public class FileProcessor{
         MemberTag memberTag = comment.tag("@member");
 
         // should be first because @member may redefine class
-        method.className = className;
-        method.shortClassName = shortClassName;
+        method.className = context.getCurrentClass().className;
+        method.shortClassName = context.getCurrentClass().shortClassName;
         method.name = StringUtils.separatePackage(extraLine)[1];
         if (methodTag!=null){
             if (!methodTag.text().isEmpty()){
@@ -405,7 +395,7 @@ public class FileProcessor{
         readParams(paramTags, method.params);
         method.hide = comment.tag("@hide")!=null;
         injectCustomTags(method, comment);
-        methods.add(method);
+        context.addDocMethod(method);
     }
 
     /**
@@ -424,11 +414,11 @@ public class FileProcessor{
         event.name = eventTag.getEventName();
         event.description = inlineLinks(eventTag.getEventDescription(), true);
         readParams(paramTags, event.params);
-        event.className = className;
-        event.shortClassName = shortClassName;
+        event.className = context.getCurrentClass().className;
+        event.shortClassName = context.getCurrentClass().shortClassName;
         event.hide = comment.tag("@hide")!=null;
         injectCustomTags(event, comment);
-        events.add(event);
+        context.addDocEvent(event);
     }
 
     enum CommentType{
@@ -511,9 +501,11 @@ public class FileProcessor{
     private void processFile(String fileName){
         try {
             File file = new File(new File(fileName).getAbsolutePath());
-            currFile = file.getName();
+            context.setCurrentFile(file);
+            context.position = 0;
             logger.info(
-                    MessageFormat.format("Processing: {0}", currFile));
+                    MessageFormat.format("Processing: {0}",
+                            context.getCurrentFile().fileName));
             BufferedReader reader =
                     new BufferedReader(new FileReader(file));
             int numRead;
@@ -525,6 +517,7 @@ public class FileProcessor{
             String comment=null;
             char ch;
             while((numRead=reader.read())!=-1){
+                context.position++;
                 ch =(char)numRead;
                 buffer.append(ch);
                 switch(state){
@@ -566,6 +559,7 @@ public class FileProcessor{
                                 processComment(comment,
                                         extraBuffer.toString(), extra2Buffer.toString());
                             }
+                            context.lastCommentPosition = context.position-2;
                             extraBuffer.setLength(0);
                             extra2Buffer.setLength(0);
                             buffer.setLength(0);
@@ -593,8 +587,8 @@ public class FileProcessor{
     }
 
     private void createClassHierarchy(){
-        for(DocClass docClass: classes){
-            for(DocClass cls: classes){
+        for(DocClass docClass: context.getClasses()){
+            for(DocClass cls: context.getClasses()){
                 if(docClass.className.equals(cls.parentClass)){
                     ClassDescr subClass = new ClassDescr();
                     subClass.className = cls.className;
@@ -603,22 +597,22 @@ public class FileProcessor{
                     cls.parent = docClass;
                 }
             }
-            for(DocCfg cfg: cfgs){
+            for(DocCfg cfg: context.getCfgs()){
                 if(docClass.className.equals(cfg.className)){
                     docClass.cfgs.add(cfg);
                 }
             }
-            for(DocProperty property: properties){
+            for(DocProperty property: context.getProperties()){
                 if(docClass.className.equals(property.className)){
                     docClass.properties.add(property);
                 }
             }
-            for(DocMethod method: methods){
+            for(DocMethod method: context.getMethods()){
                 if(docClass.className.equals(method.className)){
                     docClass.methods.add(method);
                 }
             }
-            for(DocEvent event: events){
+            for(DocEvent event: context.getEvents()){
                 if(docClass.className.equals(event.className)){
                     docClass.events.add(event);
                 }
@@ -637,7 +631,7 @@ public class FileProcessor{
         return false;
     }
 
-    private <T extends DocAttribute> void removeHidden
+    private <T extends Doc> void removeHidden
                                                                                         (List<T> docs){
         for(ListIterator<T> it = docs.listIterator(); it.hasNext();){
             if (it.next().hide)
@@ -656,7 +650,7 @@ public class FileProcessor{
 
 
     private void injectInherited(){
-        for(DocClass cls: classes){
+        for(DocClass cls: context.getClasses()){
             DocClass parent = cls.parent;
             while(parent!=null){
                 ClassDescr superClass = new ClassDescr();
@@ -687,13 +681,14 @@ public class FileProcessor{
             Collections.sort(cls.subClasses);
 
         }
+        removeHidden(context.getClasses());
     }
 
     private void createPackageHierarchy(){
-        for(DocClass cls: classes){
-            tree.addClass(cls);
+        for(DocClass cls: context.getClasses()){
+            context.addClassToTree(cls);
         }
-        tree.sort();
+        context.sortTree();
     }
 
     private void showStatistics(){
@@ -714,7 +709,7 @@ public class FileProcessor{
                     (extdoc.jsdoc.schema.Doc) unmarshaller.
                             unmarshal(fileInputStream);
             extdoc.jsdoc.schema.Source source = doc.getSource();
-            customTags = doc.getTags().getTag();
+            context.setCustomTags(doc.getTags().getTag());
             List<extdoc.jsdoc.schema.File> files = source.getFile();
             for(extdoc.jsdoc.schema.File file: files){
                 processFile(xmlFile.getParent()+ File.separator +file.getSrc());
@@ -761,6 +756,45 @@ public class FileProcessor{
             }
             in.close();
             out.close();
+        }
+    }
+
+    private void copySourceFiles(String targetDir){
+        new File(targetDir).mkdirs();
+        for(DocFile docFile: context.getDocFiles()){
+            try {
+                File dst = new File(new StringBuilder()
+                        .append(targetDir)
+                        .append(File.separator)
+                        .append(docFile.targetFileName)
+                        .toString());
+                StringBuilder buffer = new StringBuilder();
+                BufferedReader reader =
+                    new BufferedReader(new FileReader(docFile.file));
+                // current character
+                int numRead;
+                // position in file
+                int position = 0;
+                // current doc
+                ListIterator<Doc> it = docFile.docs.listIterator();
+                Doc doc=it.hasNext()?it.next():null;
+                buffer.append("<pre><code>");
+                while((numRead=reader.read())!=-1){
+                    position++;
+                    char ch = (char) numRead;
+                    if(doc!=null && position==doc.positionInFile){
+                        buffer.append(MessageFormat.format("<span id=\"{0}\"/>", doc.id));
+                        doc = it.hasNext()?it.next():null;
+                    }
+                    buffer.append(ch);
+                }
+                buffer.append("</code></pre>");
+                Writer out = new BufferedWriter(new FileWriter(dst));
+                out.write(buffer.toString());
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -823,6 +857,19 @@ public class FileProcessor{
                 copyDirectory(new File(src), new File(dst));
             }
 
+
+            logger.info("*** COPY SOURCE FILES ***");
+            String sourceTargetDir = new StringBuilder()
+                    .append(folderName)
+                    .append(File.separator)
+                    .append(template.getSource().getTargetDir())
+                    .toString();
+             logger.info(MessageFormat.format("Target folder: {0}",
+                     sourceTargetDir));
+            copySourceFiles(sourceTargetDir);
+
+
+
             // Marshall and transform classes
             JAXBContext jaxbContext =
                     JAXBContext.newInstance("extdoc.jsdoc.docs");
@@ -844,7 +891,7 @@ public class FileProcessor{
             DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 
             logger.info("*** SAVING FILES ***") ;
-            for(DocClass docClass: classes){
+            for(DocClass docClass: context.getClasses()){
                 logger.info("Saving: " + docClass.className);
                 String targetFileName = new StringBuilder()
                         .append(classTplTargetDir)
@@ -879,10 +926,10 @@ public class FileProcessor{
                     treeTransformation.newTransformer();
             Document doc =
                         builderFactory.newDocumentBuilder().newDocument();
-            treeMarshaller.marshal(tree, doc);
+            treeMarshaller.marshal(context.getTree(), doc);
             if (GENERATE_DEBUG_XML){
                     treeMarshaller.
-                            marshal(tree, new File(treeTplTargetFile+"_"));
+                            marshal(context.getTree(), new File(treeTplTargetFile+"_"));
             }
             Result fileResult = new StreamResult(new File(treeTplTargetFile));
             treeTransformer.transform(new DOMSource(doc), fileResult);
