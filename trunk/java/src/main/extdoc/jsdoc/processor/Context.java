@@ -82,7 +82,7 @@ class Context {
 
     public void addDocClass(DocClass docClass) {
         docClass.positionInFile = lastCommentPosition;
-        docClass.id = docClass.className;
+        docClass.id = "cls-" + docClass.className;
         docClass.href = currentFile.targetFileName + '#' + docClass.id;
         currentFile.docs.add(docClass);
         currentClass = docClass;
@@ -91,7 +91,7 @@ class Context {
 
     public void addDocCfg(DocCfg docCfg) {
         docCfg.positionInFile = lastCommentPosition;
-        docCfg.id = docCfg.className +'-' + docCfg.name;
+        docCfg.id = "cfg-" + docCfg.className +'-' + docCfg.name;
         docCfg.href = currentFile.targetFileName + '#' + docCfg.id;
         currentFile.docs.add(docCfg);
         cfgs.add(docCfg);
@@ -99,7 +99,7 @@ class Context {
 
     public void addDocProperty(DocProperty docProperty) {
         docProperty.positionInFile = lastCommentPosition;
-        docProperty.id = docProperty.className +'-' + docProperty.name;
+        docProperty.id = "prop-" +  docProperty.className +'-' + docProperty.name;
         docProperty.href = currentFile.targetFileName + '#' + docProperty.id;
         currentFile.docs.add(docProperty);
         properties.add(docProperty);
@@ -107,7 +107,7 @@ class Context {
 
     public void addDocMethod(DocMethod docMethod) {
         docMethod.positionInFile = lastCommentPosition;
-        docMethod.id = docMethod.className +'-' + docMethod.name;
+        docMethod.id = "method-" + docMethod.className +'-' + docMethod.name;
         docMethod.href = currentFile.targetFileName + '#' + docMethod.id;
         currentFile.docs.add(docMethod);
         methods.add(docMethod);
@@ -115,7 +115,7 @@ class Context {
 
     public void addDocEvent(DocEvent docEvent) {
         docEvent.positionInFile = lastCommentPosition;
-        docEvent.id = docEvent.className +'-'+ docEvent.name;
+        docEvent.id = "event-" + docEvent.className +'-'+ docEvent.name;
         docEvent.href = currentFile.targetFileName + '#' + docEvent.id;
         currentFile.docs.add(docEvent);
         events.add(docEvent);
