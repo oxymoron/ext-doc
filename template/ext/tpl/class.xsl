@@ -179,7 +179,7 @@
                                                 <xsl:call-template name="check-if-static"/>
                                                 <xsl:value-of select="description/longDescr" disable-output-escaping="yes"/>
                                                 <xsl:call-template name="method-params-details"/>
-                                                <xsl:call-template name="custom-tags"/>
+                                                <xsl:if test="customTags"><b><xsl:value-of select="customTags/title"/></b> : <xsl:value-of select="customTags/value"/></xsl:if>
                                             </div>
                                         </div>
                                     </td>

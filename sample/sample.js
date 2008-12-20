@@ -42,6 +42,7 @@ SamplePackage.SampleClass = Ext.extend(Ext.Panel, {
 
     /**
      * This is a method declaration
+     * @author oxymoron
      */
     methodOne : function(){},
 
