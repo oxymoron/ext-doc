@@ -50,7 +50,7 @@ public class FileProcessor{
 
     private static final String
         MEMBER_REFERENCE_TPL =
-            "<a href=\"output/{0}.html#{1}\" " +
+            "<a href=\"output/{0}.html#{0}-{1}\" " +
                     "ext:member=\"{1}\" ext:cls=\"{0}\">{2}</a>";
 
     private static final String
@@ -237,20 +237,9 @@ public class FileProcessor{
             cls.shortClassName = str[1];
         }
         cls.definedIn = context.getCurrentFile().fileName;
-        cls.singleton = singletonTag!=null;
-        String description = classTag.getClassDescription();
-        if (description==null && extendsTag!=null){
-            description = extendsTag.getClassDescription();
-        }
-        Description descr = inlineLinks(description);
-        cls.description = descr!=null?descr.longDescr:null;
+        cls.singleton = singletonTag!=null;        
         cls.parentClass =
                 (extendsTag!=null)?extendsTag.getClassName():null;
-        cls.hasConstructor = constructorTag!=null;
-        if (constructorTag!=null){
-            cls.constructorDescription = inlineLinks(constructorTag.text(), true);
-            readParams(paramTags, cls.params);
-        }
 
         // Skip private classes
         if (comment.hasTag("@private")
@@ -259,6 +248,21 @@ public class FileProcessor{
 
         }        
         context.addDocClass(cls);
+
+        // process inline links after class added to context
+        // DEFCT17
+        cls.hasConstructor = constructorTag!=null;
+        if (constructorTag!=null){
+            cls.constructorDescription = inlineLinks(constructorTag.text(), true);
+            readParams(paramTags, cls.params);
+        }
+
+        String description = classTag.getClassDescription();
+        if (description==null && extendsTag!=null){
+            description = extendsTag.getClassDescription();
+        }
+        Description descr = inlineLinks(description);
+        cls.description = descr!=null?descr.longDescr:null;
 
         // Process cfg declared inside class definition
         // goes after global className set
