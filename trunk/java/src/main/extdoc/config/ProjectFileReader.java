@@ -26,15 +26,15 @@ public class ProjectFileReader{
         Logger logger = config.getLogger();
         // check if project file name specified in command line options
         if(config.hasProjectFile()){
-            logger.fine("Processing project file...");
-            File projectFile =
-                    new File(new File(config.getProject()).getAbsolutePath());
+            logger.fine("Processing project file...");                        
+
+            File projectFile = new File(config.getProject());
             try {
                 InputStream in = new FileInputStream(projectFile);
                 try{
                     // unmarshall
                     JAXBContext jaxbContext =
-                            JAXBContext.newInstance("extdoc.project");
+                            JAXBContext.newInstance("extdoc.gen.project");
                     Unmarshaller unmarshaller =
                             jaxbContext.createUnmarshaller();
                     Project project =(Project) unmarshaller.unmarshal(in);
