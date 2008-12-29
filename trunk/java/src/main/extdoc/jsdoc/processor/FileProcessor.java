@@ -3,21 +3,11 @@ package extdoc.jsdoc.processor;
 import extdoc.jsdoc.docs.*;
 import extdoc.jsdoc.tags.*;
 import extdoc.jsdoc.tags.impl.Comment;
-import extdoc.jsdoc.tplschema.*;
 import extdoc.jsdoc.util.StringUtils;
-import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -826,152 +816,152 @@ public class FileProcessor{
         }
     }
 
-    public void saveToFolder(String folderName, String templateFileName){
-        new File(folderName).mkdirs();
-        try {
-
-            File templateFile =
-                    new File(new File(templateFileName).getAbsolutePath());
-            String templateFolder = templateFile.getParent();
-
-            // Read template.xml
-            JAXBContext jaxbTplContext =
-                    JAXBContext.newInstance("extdoc.jsdoc.tplschema");
-            Unmarshaller unmarshaller = jaxbTplContext.createUnmarshaller();
-            Template template = (Template) unmarshaller.
-                        unmarshal(new FileInputStream(templateFile));
-            ClassTemplate classTemplate = template.getClassTemplate();
-            String classTplFileName = new StringBuilder()
-                    .append(templateFolder)
-                    .append(File.separator)
-                    .append(classTemplate.getTpl())
-                    .toString();
-            String classTplTargetDir = new StringBuilder()
-                    .append(folderName)
-                    .append(File.separator)
-                    .append(classTemplate.getTargetDir())
-                    .toString();
-            TreeTemplate treeTemplate = template.getTreeTemplate();
-            String treeTplFileName = new StringBuilder()
-                    .append(templateFolder)
-                    .append(File.separator)
-                    .append(treeTemplate.getTpl())
-                    .toString();
-            String treeTplTargetFile = new StringBuilder()
-                    .append(folderName)
-                    .append(File.separator)
-                    .append(treeTemplate.getTargetFile())
-                    .toString();
-
-            logger.info("*** COPY RESOURCES ***") ;
-            new File(classTplTargetDir).mkdirs();
-
-            // Copy resources
-            Resources resources = template.getResources();
-
-            List<Copy> dirs = resources.getCopy();
-
-            for(Copy dir : dirs){
-                String src = new StringBuilder()
-                    .append(templateFolder)
-                    .append(File.separator)
-                    .append(dir.getSrc())
-                    .toString();
-                String dst = new StringBuilder()
-                    .append(folderName)
-                    .append(File.separator)
-                    .append(dir.getDst())
-                    .toString();
-                copyDirectory(new File(src), new File(dst));
-            }
-
-
-            logger.info("*** COPY SOURCE FILES ***");
-            String sourceTargetDir = new StringBuilder()
-                    .append(folderName)
-                    .append(File.separator)
-                    .append(template.getSource().getTargetDir())
-                    .toString();
-             logger.info(MessageFormat.format("Target folder: {0}",
-                     sourceTargetDir));
-            String wrapperFile = templateFolder + File.separator +
-                    template.getSource().getWrapper(); 
-            copySourceFiles(sourceTargetDir, wrapperFile);
-
-
-
-            // Marshall and transform classes
-            JAXBContext jaxbContext =
-                    JAXBContext.newInstance("extdoc.jsdoc.docs");
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(
-                    Marshaller.JAXB_FORMATTED_OUTPUT,
-                    true
-            );
-            DocumentBuilderFactory builderFactory =
-                    DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
-
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Templates transformation = 
-                    factory
-                            .newTemplates (new StreamSource(classTplFileName)) ;
-            Transformer transformer = transformation.newTransformer();
-
-            DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
-
-            logger.info("*** SAVING FILES ***") ;
-            for(DocClass docClass: context.getClasses()){
-                logger.info("Saving: " + docClass.className);
-                String targetFileName = new StringBuilder()
-                        .append(classTplTargetDir)
-                        .append(File.separator)
-                        .append(docClass.className)
-                        .append('.')
-                        .append(OUT_FILE_EXTENSION)
-                        .toString();
-                Document doc = docBuilder.newDocument();
-                marshaller.marshal(docClass, doc);
-                if (GENERATE_DEBUG_XML){
-                    marshaller.marshal(docClass, new File(targetFileName+"_"));
-                }
-                Result fileResult = new StreamResult(new File(targetFileName));
-                transformer.transform(new DOMSource(doc), fileResult);
-                transformer.reset();
-            }
-
-            // Marshall and transform tree
-            JAXBContext jaxbTreeContext =
-                    JAXBContext.newInstance("extdoc.jsdoc.tree");
-            Marshaller treeMarshaller = jaxbTreeContext.createMarshaller();
-            treeMarshaller.setProperty(
-                    Marshaller.JAXB_FORMATTED_OUTPUT,
-                    true
-            );
-
-            Templates treeTransformation =
-                    factory
-                            .newTemplates (new StreamSource(treeTplFileName)) ;
-            Transformer treeTransformer =
-                    treeTransformation.newTransformer();
-            Document doc =
-                        builderFactory.newDocumentBuilder().newDocument();
-            treeMarshaller.marshal(context.getTree(), doc);
-            if (GENERATE_DEBUG_XML){
-                    treeMarshaller.
-                            marshal(context.getTree(), new File(treeTplTargetFile+"_"));
-            }
-            Result fileResult = new StreamResult(new File(treeTplTargetFile));
-            treeTransformer.transform(new DOMSource(doc), fileResult);
-
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void saveToFolder(String folderName, String templateFileName){
+//        new File(folderName).mkdirs();
+//        try {
+//
+//            File templateFile =
+//                    new File(new File(templateFileName).getAbsolutePath());
+//            String templateFolder = templateFile.getParent();
+//
+//            // Read template.xml
+//            JAXBContext jaxbTplContext =
+//                    JAXBContext.newInstance("extdoc.jsdoc.tplschema");
+//            Unmarshaller unmarshaller = jaxbTplContext.createUnmarshaller();
+//            Template template = (Template) unmarshaller.
+//                        unmarshal(new FileInputStream(templateFile));
+//            ClassTemplate classTemplate = template.getClassTemplate();
+//            String classTplFileName = new StringBuilder()
+//                    .append(templateFolder)
+//                    .append(File.separator)
+//                    .append(classTemplate.getTpl())
+//                    .toString();
+//            String classTplTargetDir = new StringBuilder()
+//                    .append(folderName)
+//                    .append(File.separator)
+//                    .append(classTemplate.getTargetDir())
+//                    .toString();
+//            TreeTemplate treeTemplate = template.getTreeTemplate();
+//            String treeTplFileName = new StringBuilder()
+//                    .append(templateFolder)
+//                    .append(File.separator)
+//                    .append(treeTemplate.getTpl())
+//                    .toString();
+//            String treeTplTargetFile = new StringBuilder()
+//                    .append(folderName)
+//                    .append(File.separator)
+//                    .append(treeTemplate.getTargetFile())
+//                    .toString();
+//
+//            logger.info("*** COPY RESOURCES ***") ;
+//            new File(classTplTargetDir).mkdirs();
+//
+//            // Copy resources
+//            Resources resources = template.getResources();
+//
+//            List<Copy> dirs = resources.getCopy();
+//
+//            for(Copy dir : dirs){
+//                String src = new StringBuilder()
+//                    .append(templateFolder)
+//                    .append(File.separator)
+//                    .append(dir.getSrc())
+//                    .toString();
+//                String dst = new StringBuilder()
+//                    .append(folderName)
+//                    .append(File.separator)
+//                    .append(dir.getDst())
+//                    .toString();
+//                copyDirectory(new File(src), new File(dst));
+//            }
+//
+//
+//            logger.info("*** COPY SOURCE FILES ***");
+//            String sourceTargetDir = new StringBuilder()
+//                    .append(folderName)
+//                    .append(File.separator)
+//                    .append(template.getSource().getTargetDir())
+//                    .toString();
+//             logger.info(MessageFormat.format("Target folder: {0}",
+//                     sourceTargetDir));
+//            String wrapperFile = templateFolder + File.separator +
+//                    template.getSource().getWrapper();
+//            copySourceFiles(sourceTargetDir, wrapperFile);
+//
+//
+//
+//            // Marshall and transform classes
+//            JAXBContext jaxbContext =
+//                    JAXBContext.newInstance("extdoc.jsdoc.docs");
+//            Marshaller marshaller = jaxbContext.createMarshaller();
+//            marshaller.setProperty(
+//                    Marshaller.JAXB_FORMATTED_OUTPUT,
+//                    true
+//            );
+//            DocumentBuilderFactory builderFactory =
+//                    DocumentBuilderFactory.newInstance();
+//            builderFactory.setNamespaceAware(true);
+//
+//            TransformerFactory factory = TransformerFactory.newInstance();
+//            Templates transformation =
+//                    factory
+//                            .newTemplates (new StreamSource(classTplFileName)) ;
+//            Transformer transformer = transformation.newTransformer();
+//
+//            DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
+//
+//            logger.info("*** SAVING FILES ***") ;
+//            for(DocClass docClass: context.getClasses()){
+//                logger.info("Saving: " + docClass.className);
+//                String targetFileName = new StringBuilder()
+//                        .append(classTplTargetDir)
+//                        .append(File.separator)
+//                        .append(docClass.className)
+//                        .append('.')
+//                        .append(OUT_FILE_EXTENSION)
+//                        .toString();
+//                Document doc = docBuilder.newDocument();
+//                marshaller.marshal(docClass, doc);
+//                if (GENERATE_DEBUG_XML){
+//                    marshaller.marshal(docClass, new File(targetFileName+"_"));
+//                }
+//                Result fileResult = new StreamResult(new File(targetFileName));
+//                transformer.transform(new DOMSource(doc), fileResult);
+//                transformer.reset();
+//            }
+//
+//            // Marshall and transform tree
+//            JAXBContext jaxbTreeContext =
+//                    JAXBContext.newInstance("extdoc.jsdoc.tree");
+//            Marshaller treeMarshaller = jaxbTreeContext.createMarshaller();
+//            treeMarshaller.setProperty(
+//                    Marshaller.JAXB_FORMATTED_OUTPUT,
+//                    true
+//            );
+//
+//            Templates treeTransformation =
+//                    factory
+//                            .newTemplates (new StreamSource(treeTplFileName)) ;
+//            Transformer treeTransformer =
+//                    treeTransformation.newTransformer();
+//            Document doc =
+//                        builderFactory.newDocumentBuilder().newDocument();
+//            treeMarshaller.marshal(context.getTree(), doc);
+//            if (GENERATE_DEBUG_XML){
+//                    treeMarshaller.
+//                            marshal(context.getTree(), new File(treeTplTargetFile+"_"));
+//            }
+//            Result fileResult = new StreamResult(new File(treeTplTargetFile));
+//            treeTransformer.transform(new DOMSource(doc), fileResult);
+//
+//        } catch (JAXBException e) {
+//            e.printStackTrace();
+//        } catch (ParserConfigurationException e) {
+//            e.printStackTrace();
+//        } catch (TransformerException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
