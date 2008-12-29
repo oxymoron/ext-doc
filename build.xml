@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="ext-doc" default="all">
+<project name="ext-doc-1.1" default="all">
 
     <property environment="env"/>    
     <property file="build.properties"/>
     <property name="version" value="snapshot"/>
+    <property name="cli" value="commons-cli-1.1.jar"/>
+    <property name="io" value="commons-io-1.4.jar"/>
 
     <path id="classpath.base">
         <pathelement location="${build.dir}/classes"/>
+        <pathelement location="${lib.dir}/${cli}"/>
+        <pathelement location="${lib.dir}/${io}"/>
     </path>
 
     <path id="classpath.test">
@@ -23,15 +27,14 @@
     
     <target name="clean">
         <delete dir="${build.dir}"/>
-        <delete dir="${src.dir}/extdoc/jsdoc/schema"/>
-        <delete dir="${src.dir}/extdoc/jsdoc/tplschema"/>
+        <delete dir="${src.dir}/extdoc/gen"/>
     </target>
 
     <target name="compile">
         <mkdir dir="${build.dir}/classes"/>
-        <xjc schema="${schema.dir}/ext-doc.xsd" destdir="${src.dir}" package="extdoc.jsdoc.schema"/>
-        <xjc schema="${schema.dir}/template.xsd" destdir="${src.dir}" package="extdoc.jsdoc.tplschema"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}/classes" debug="on"/>        
+        <xjc schema="${schema.dir}/project.xsd" destdir="${src.dir}" package="extdoc.gen.project"/>
+        <xjc schema="${schema.dir}/syntax.xsd" destdir="${src.dir}" package="extdoc.gen.syntax"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}/classes" debug="on" classpathref="classpath.base"/>        
     </target>
 
     <target name="compile-test" depends="compile">

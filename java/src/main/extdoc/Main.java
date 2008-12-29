@@ -1,6 +1,11 @@
 package extdoc;
 
-import extdoc.jsdoc.processor.FileProcessor;
+import extdoc.config.CliReader;
+import extdoc.config.Config;
+import extdoc.config.ProjectFileReader;
+import extdoc.parser.Context;
+import extdoc.parser.Parser;
+import extdoc.parser.impl.FileParser;
 
 /**
  * User: Andrey Zubkov
@@ -10,11 +15,19 @@ import extdoc.jsdoc.processor.FileProcessor;
 
 public class Main {
     public static void main(String[] args) {
-        String xmlFileName = args[0];
-        String outputFolderName = args[1];
-        String templateFileName = args[2];
-        FileProcessor processor = new FileProcessor();
-        processor.process(xmlFileName);
-        processor.saveToFolder(outputFolderName, templateFileName);
-    }
+
+        // create config
+        Config config = new Config();
+
+        // read command line options to config
+        new CliReader(args).read(config);
+
+        // add more config information from project file if specified
+        new ProjectFileReader().read(config);
+
+        // start parsing using config
+        Context context = new Context();
+        Parser parser = new FileParser(config);
+        parser.parse(context);
+    }    
 }
