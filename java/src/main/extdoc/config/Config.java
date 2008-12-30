@@ -1,5 +1,7 @@
 package extdoc.config;
 
+import extdoc.gen.syntax.Syntax;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -23,6 +25,8 @@ public class Config {
     private List<String> plugins = new ArrayList<String>();
 
     private Logger logger = null;
+
+    private Syntax syntax = null;
 
     public boolean hasProjectFile(){
         return project!=null;
@@ -77,5 +81,13 @@ public class Config {
 
     public void addPlugin(String plugin) {
         plugins.add(plugin);
+    }
+
+    public Syntax getSyntax() {
+        return syntax;
+    }
+
+    public void setSyntax(Syntax syntax) {
+        this.syntax = syntax;
     }
 }

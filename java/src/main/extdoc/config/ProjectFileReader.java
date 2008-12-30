@@ -2,10 +2,13 @@ package extdoc.config;
 
 import extdoc.gen.project.*;
 import org.apache.commons.io.IOUtils;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +32,7 @@ public class ProjectFileReader{
             logger.fine("Processing project file...");                        
 
             File projectFile = new File(config.getProject());
+            File projectDir = projectFile.getParentFile();
             try {
                 InputStream in = new FileInputStream(projectFile);
                 try{
@@ -37,6 +41,13 @@ public class ProjectFileReader{
                             JAXBContext.newInstance("extdoc.gen.project");
                     Unmarshaller unmarshaller =
                             jaxbContext.createUnmarshaller();
+
+                    SchemaFactory sf = SchemaFactory.newInstance(
+                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    Schema schema =
+                            sf.newSchema(new File("schema","project.xsd"));
+                    unmarshaller.setSchema(schema);
+
                     Project project =(Project) unmarshaller.unmarshal(in);
 
                     // read sources
@@ -69,13 +80,19 @@ public class ProjectFileReader{
                     // read syntax file
                     Syntax syntax = project.getSyntax();
                     if(syntax!=null){
-                        new SyntaxFileReader(syntax.getFile()).read(config);    
+                        new SyntaxFileReader(
+                                new File(projectDir, syntax.getFile()))
+                                    .read(config);
                     }
 
                 config.getLogger().fine("Project file processed.");
                 } catch (JAXBException e) {
-                    logger.severe("Error while parsing: " + e.getMessage());
-                }finally{
+                    logger.severe("Error while parsing: "
+                            + e.getLinkedException().getMessage());
+                } catch (SAXException e) {
+                    logger.severe(
+                            "Error while parsing schema: " + e.getMessage());                    
+                } finally{
                     IOUtils.closeQuietly(in);
                 }
             }catch (FileNotFoundException e) {
