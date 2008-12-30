@@ -75,6 +75,10 @@
             <fileset dir="${lib.dir}" includes="${cli}"/>
             <fileset dir="${lib.dir}" includes="${io}"/>
         </copy>
+        <mkdir dir="${build.dir}/dist/ext-doc-${version}/schema"/>
+        <copy todir="${build.dir}/dist/ext-doc-${version}/schema">
+            <fileset dir="schema" includes="*.xsd"/>
+        </copy>
         <copy todir="${build.dir}/dist/ext-doc-${version}" file="README.txt"/>
         <zip destfile="${build.dir}/ext-doc-${version}.zip" basedir="${build.dir}/dist"/>        
     </target>

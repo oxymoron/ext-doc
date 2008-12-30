@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 rel. 3 (http://www.altova.com) by oxymoron (EMBRACE) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:element name="syntax">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="comment">
-					<xs:complexType>
-						<xs:attribute name="start" use="required"/>
-						<xs:attribute name="end" use="required"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="tags">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="tag"/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
+				<xs:element ref="comment"/>
+				<xs:element ref="tags"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
+	<xs:element name="comment">
+		<xs:complexType>
+			<xs:attribute name="start" use="required"/>
+			<xs:attribute name="end" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="tags">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="tag" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="tag"/>
 </xs:schema>
