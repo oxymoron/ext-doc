@@ -43,7 +43,8 @@ public class SyntaxFileReader {
                 SchemaFactory sf = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema schema =
-                        sf.newSchema(new File("schema","syntax.xsd"));
+                        sf.newSchema(ClassLoader.getSystemClassLoader()
+                                    .getResource("schema/syntax.xsd"));
                 unmarshaller.setSchema(schema);
                 Syntax syntax =(Syntax) unmarshaller.unmarshal(in);
                 config.setSyntax(syntax);
@@ -55,6 +56,7 @@ public class SyntaxFileReader {
                         + e.getMessage());                
             } finally{
                 IOUtils.closeQuietly(in);
+                logger.fine("Syntax file processed fine.");
             }            
         } catch (FileNotFoundException e) {
             logger.severe(MessageFormat.format(

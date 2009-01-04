@@ -45,7 +45,8 @@ public class ProjectFileReader{
                     SchemaFactory sf = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
                     Schema schema =
-                            sf.newSchema(new File("schema","project.xsd"));
+                            sf.newSchema(ClassLoader.getSystemClassLoader()
+                                    .getResource("schema/project.xsd"));
                     unmarshaller.setSchema(schema);
 
                     Project project =(Project) unmarshaller.unmarshal(in);
@@ -58,7 +59,8 @@ public class ProjectFileReader{
                             for(Source src : source){
                                 logger.fine(MessageFormat.format(
                                         "Source added: {0}",src.getSrc()));
-                                config.addSource(src.getSrc(),src.getMatch(),
+                                config.addSource(projectDir.getName(),
+                                        src.getSrc(),src.getMatch(),
                                         src.isSkipHidden());
                             }
                         }

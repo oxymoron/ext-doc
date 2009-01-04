@@ -15,6 +15,7 @@ public class Config {
 
     private static final boolean DEFAULT_SKIPHIDDEN = true;
     private static final String DEFAULT_MATCH = "*.js";
+    private static final String DEFAULT_DIR = ".";
 
     private String project = null;
 
@@ -44,15 +45,18 @@ public class Config {
         sources.add(source);
     }
 
-    public void addSource(String src, String match, Boolean skipHidden){
+    public void addSource(String baseDir, String src,
+                          String match, Boolean skipHidden){
         addSource(new ConfigSource(
+                baseDir,
                 src,
                 match!=null?match:DEFAULT_MATCH,
                 skipHidden!=null?skipHidden:DEFAULT_SKIPHIDDEN));
     }
 
     public void addSource(String source){
-        addSource(new ConfigSource(source, DEFAULT_MATCH, DEFAULT_SKIPHIDDEN));
+        addSource(new ConfigSource(DEFAULT_DIR, source,
+                DEFAULT_MATCH, DEFAULT_SKIPHIDDEN));
     }
 
     public List<ConfigSource> getSources(){
