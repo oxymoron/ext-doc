@@ -2,6 +2,7 @@ package extdoc;
 
 import extdoc.config.CliReader;
 import extdoc.config.Config;
+import extdoc.config.ContextBuilder;
 import extdoc.config.ProjectFileReader;
 import extdoc.parser.Context;
 import extdoc.parser.Parser;
@@ -25,9 +26,11 @@ public class Main {
         // add more config information from project file if specified
         new ProjectFileReader().read(config);
 
-        // start parsing using config
-        Context context = new Context();
-        Parser parser = new FileParser(config);
+        // create context form config
+        Context context = new ContextBuilder().build(config);
+
+        // start parsing using context
+        Parser parser = new FileParser();
         parser.parse(context);
     }    
 }
