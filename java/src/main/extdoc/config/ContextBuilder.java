@@ -49,7 +49,6 @@ public class ContextBuilder {
             logger.warning(
                     MessageFormat.format("File {0} not found", src));
         }
-
     }
 
     public Context build(Config config){
@@ -57,15 +56,20 @@ public class ContextBuilder {
         logger.fine("Building context...");
         Context context = new Context();
 
+        context.logger = config.getLogger();
+
         // prepare source files
         List<ConfigSource> sources = config.getSources();
         for(ConfigSource src : sources){
             addFiles(context, src.baseDir, src.src, src.match, src.skipHidden);
         }
         
-        logger.fine(MessageFormat.format("Total source files: {0}",
+        logger.info(MessageFormat.format("Total source files: {0}",
                 context.files.size()));        
-        
+
+        context.startComment = config.getSyntax().getComment().getStart();
+        context.endComment = config.getSyntax().getComment().getEnd();
+
         logger.fine("Context have been built successfully.");
         return context;
     }

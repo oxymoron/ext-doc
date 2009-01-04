@@ -6,5 +6,5 @@ package extdoc.parser;
  * Time: 0:35:44
  */
 public interface Parser {
-    void parse(Context context);
+    void parse();
 }
