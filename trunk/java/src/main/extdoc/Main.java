@@ -30,7 +30,7 @@ public class Main {
         Context context = new ContextBuilder().build(config);
 
         // start parsing using context
-        Parser parser = new FileParser();
-        parser.parse(context);
+        Parser parser = new FileParser(context);
+        parser.parse();
     }    
 }
