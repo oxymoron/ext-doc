@@ -51,6 +51,7 @@ public class SyntaxFileReader {
             }catch (JAXBException e) {
                 logger.severe("Error while parsing: "
                         + e.getLinkedException().getMessage());
+                
             } catch (SAXException e) {
                 logger.severe("Error while parsing syntax schema: "
                         + e.getMessage());                

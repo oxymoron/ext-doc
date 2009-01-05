@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <syntax>
-	<comment start="/**" end="*/"/>
+	<comment start="/**" end="*/">
+        <preprocessor class="extdoc.comment.impl.StandardCommentPreprocessor"/>
+        <preprocessor class="extdoc.comment.ExtCommentProcessor"/>
+    </comment>
 	<tags>
 		<tag/>
 	</tags>

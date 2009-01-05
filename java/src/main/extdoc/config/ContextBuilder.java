@@ -1,10 +1,15 @@
 package extdoc.config;
 
+import extdoc.gen.syntax.Preprocessor;
 import extdoc.jsdoc.util.StringUtils;
 import extdoc.parser.Context;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -58,6 +63,20 @@ public class ContextBuilder {
 
         context.logger = config.getLogger();
 
+        // get plugins for dynamic class loading
+        List<String> plugins = config.getPlugins();
+        List<URL> urls = new ArrayList<URL>();
+        for(String plugin : plugins){
+            try {
+                urls.add(new URL("jar:file:" + plugin + "!/"));
+            } catch (MalformedURLException e) {
+                logger.warning(MessageFormat.format(
+                        "Plug-in URL: {0} is not correct", plugin));
+            }
+        }
+        ClassLoader cl =
+                URLClassLoader.newInstance(urls.toArray(new URL[urls.size()]));        
+
         // prepare source files
         List<ConfigSource> sources = config.getSources();
         for(ConfigSource src : sources){
@@ -69,6 +88,26 @@ public class ContextBuilder {
 
         context.startComment = config.getSyntax().getComment().getStart();
         context.endComment = config.getSyntax().getComment().getEnd();
+
+        List<Preprocessor> preprocessors =
+                config.getSyntax().getComment().getPreprocessor();
+        for(Preprocessor p : preprocessors){
+            String className = p.getClazz();
+            try {
+                context.preprocessors.add(
+                    (extdoc.comment.Preprocessor)Class.forName(
+                            className, true, cl).newInstance());
+            } catch (ClassNotFoundException e) {
+                logger.severe(MessageFormat.format(
+                        "Class {0} not found", e.getMessage()));
+            } catch (IllegalAccessException e) {
+                logger.severe(e.getMessage());
+            } catch (InstantiationException e) {
+                logger.severe(e.getMessage());
+            }
+
+        }
+
 
         logger.fine("Context have been built successfully.");
         return context;
