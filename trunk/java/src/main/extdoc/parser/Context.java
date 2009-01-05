@@ -1,5 +1,7 @@
 package extdoc.parser;
 
+import extdoc.comment.Preprocessor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,5 +27,12 @@ public class Context {
     public StringBuilder code = new StringBuilder();
 
     public StringBuilder comment = new StringBuilder();
+
+    /**
+     * Current position in file
+     */
+    public long position = 0;
+
+    public List<Preprocessor> preprocessors = new ArrayList<Preprocessor>();
 
 }

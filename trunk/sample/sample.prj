@@ -4,7 +4,7 @@
 		<source src="ext/source"/>
 	</sources>
 	<plugins>
-		<plugin file="../plugins/ext-doc.jar"/>
+		<plugin file="plugins/ext/build/dist/ext-plugin-snapshot/ext-plugin.jar"/>
 	</plugins>
 	<syntax file="sample.syn"/>
 </project>

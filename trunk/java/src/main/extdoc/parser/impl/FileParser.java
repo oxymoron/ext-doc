@@ -29,6 +29,17 @@ public class FileParser implements Parser {
 
     private void processBlock(){
 
+        // here comment and code come with start comment sequence or
+        // end comment sequence at the end. Let's cut it.
+        int commentLength = context.comment.length();
+        int codeLength = context.code.length();
+        int startCommentLength = context.startComment.length();
+        int endCommentLength = context.endComment.length();
+        context.comment.setLength(
+            commentLength>=endCommentLength?commentLength-endCommentLength:0);
+        context.code.setLength(
+            codeLength>=startCommentLength?codeLength-startCommentLength:0);
+        
     }
 
     private void processCurrentFile(){
@@ -41,7 +52,9 @@ public class FileParser implements Parser {
                 int numRead;
                 char ch;
                 State state = State.CODE;
+                context.position = 0;
                 while((numRead=reader.read())!=-1){
+                    context.position++;
                     ch =(char)numRead;                    
                     switch (state){
                         case CODE:
@@ -50,7 +63,7 @@ public class FileParser implements Parser {
                                     context.code, context.startComment)){
                                 state = State.COMMENT;
 
-                                // process COMMENT + CODE
+                                // process COMMENT+CODE (with start/end markers)
                                 processBlock();
 
                                 // clear buffers
