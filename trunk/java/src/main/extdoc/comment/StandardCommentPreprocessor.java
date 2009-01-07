@@ -1,6 +1,5 @@
-package extdoc.comment.impl;
+package extdoc.comment;
 
-import extdoc.comment.Preprocessor;
 import extdoc.parser.Context;
 
 /**
