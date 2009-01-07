@@ -89,25 +89,28 @@ public class ContextBuilder {
         context.startComment = config.getSyntax().getComment().getStart();
         context.endComment = config.getSyntax().getComment().getEnd();
 
-        List<Preprocessor> preprocessors =
-                config.getSyntax().getComment().getPreprocessor();
-        for(Preprocessor p : preprocessors){
-            String className = p.getClazz();
-            try {
+        try {
+
+            // load preprocessors
+            List<Preprocessor> preprocessors =
+                    config.getSyntax().getComment().getPreprocessor();
+            for(Preprocessor p : preprocessors){
+                String className = p.getClazz();
                 context.preprocessors.add(
-                    (extdoc.comment.Preprocessor)Class.forName(
-                            className, true, cl).newInstance());
-            } catch (ClassNotFoundException e) {
-                logger.severe(MessageFormat.format(
-                        "Class {0} not found", e.getMessage()));
-            } catch (IllegalAccessException e) {
-                logger.severe(e.getMessage());
-            } catch (InstantiationException e) {
-                logger.severe(e.getMessage());
+                    (extdoc.comment.Preprocessor)
+                            Class.forName(className, true, cl).newInstance());
             }
 
-        }
+            
 
+        } catch (ClassNotFoundException e) {
+            logger.severe(MessageFormat.format(
+                    "Class {0} not found", e.getMessage()));
+        } catch (IllegalAccessException e) {
+            logger.severe(e.getMessage());
+        } catch (InstantiationException e) {
+            logger.severe(e.getMessage());
+        }
 
         logger.fine("Context have been built successfully.");
         return context;
