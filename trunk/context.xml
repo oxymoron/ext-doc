@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean name="comment" class="extdoc.parser.Comment">
+        <property name="startsWith" value="/**"/>
+        <property name="endsWith" value="*/"/>
+        <property name="preprocessor" ref="preprocessor"/>
+    </bean>
+
+    <bean name="context" class="extdoc.parser.Context">
+
+        <!-- Sources -->
+        <property name="sources">
+            <list>
+                <bean class="extdoc.parser.Source">
+                    <property name="src" value="sample/ext/source"/>
+                    <property name="match" value="*.js"/>
+                    <property name="skipHidden" value="true"/>
+                </bean>
+            </list>
+        </property>
+
+        <property name="comment" ref="comment"/>
+
+    </bean>
+
+    <bean id="preprocessor" class="extdoc.comment.StandardCommentPreprocessor">
+        <property name="assumeWhitespace">
+            <set>
+                <value>*</value>
+            </set>
+        </property>
+    </bean>
+
+</beans>
