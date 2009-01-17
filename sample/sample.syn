@@ -2,7 +2,6 @@
 <syntax>
 	<comment start="/**" end="*/">
         <preprocessor class="extdoc.comment.StandardCommentPreprocessor"/>
-        <preprocessor class="extdoc.comment.ExtCommentProcessor"/>
     </comment>
 	<tags>
 		<tag/>
