@@ -1,0 +1,81 @@
+#summary Specification
+#labels Featured
+
+= 1 Supported tags =
+
+Full list of tags:
+
+ == 1.1 @class ==
+
+Format: 
+
+*@class [class-name] [class-description]*
+
+*class-name* : Full class name
+
+*class-description*: Class description
+
+Example: 
+
+{{{
+/**
+ * @class SamplePackage.MyClass
+ * This is a sample class
+ */
+}}}
+
+
+ == 1.2 @extends ==
+
+This tag is used in class declaration to specify class parent.
+
+Format: 
+
+*@extends [parent-class] [class-description]*
+
+*parent-class* : Full class name
+
+*class-description*: Current class (!) description
+
+Example: 
+
+{{{
+/**
+ * @class SamplePackage.MyClass
+ * @extends SamplePackage.ParentClass
+ * This is a sample class (this is a description of SamplePackage.MyClass!)
+ */
+}}}
+
+
+
+ * @ignore
+ * @constructor
+ * @property
+ * @return
+ * @param
+ * @member
+ * @cfg
+
+ * @static
+ * @type
+ * @singleton
+ * @event
+ * @hide
+ * @private
+ * @method
+ * @namespace
+
+= 2 Custom tags =
+
+
+= 3 Docs =
+
+ * Class
+
+== 3.1 Attributes ==
+
+ * Config
+ * Property
+ * Method
+ * Event
