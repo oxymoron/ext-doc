@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean name="parser" class="org.extdoc.Parser">
+
+        <property name="commentStartsWith" value="/**"/>
+        <property name="commentEndsWith" value="*/"/>
+        
+        <property name="context" ref="context"/>
+
+        <property name="tagReader" ref="tagReader"/>
+
+        <property name="preprocessors">
+            <list>
+                <ref bean="preprocessor"/>
+            </list>
+        </property>
+
+        <!-- Sources -->
+        <property name="sources">
+            <list>
+                <bean class="org.extdoc.Source">
+                    <property name="src" value="test/source"/>
+                    <property name="match" value="*.js"/>
+                    <property name="skipHidden" value="true"/>
+                </bean>
+                <bean class="org.extdoc.Source">
+                    <property name="src" value="non-existing-path"/>
+                    <property name="match" value="a?b.js"/>
+                    <property name="skipHidden" value="true"/>
+                </bean>
+            </list>
+        </property>
+
+    </bean>
+
+    <bean name="context" class="org.extdoc.Context"/>       
+
+    <bean name="preprocessor" class="org.extdoc.StandardCommentPreprocessor">
+        <property name="assumeWhitespace">
+            <set>
+                <value>*</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean name="tagReader" class="org.extdoc.StandardTagReader">
+        <property name="tagMarker" value="@"/>
+        <property name="inlineTagStartsWith" value="{@"/>
+        <property name="inlineTagEndsWith" value="}"/>
+        <property name="tagResolver" ref="tagResolver"/>
+    </bean>
+
+    <bean name="tagResolver" class="org.extdoc.StandardTagResolver">
+        <property name="tagFactories">
+            <map>
+                <entry key="class" value-ref="classTagFactory"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="classTagFactory" class="org.extdoc.StandardTagFactory">
+        <constructor-arg value="2"/>
+    </bean>
+
+</beans>
