@@ -1,0 +1,51 @@
+#summary Descriptions and examples of attribute-level tags supported by Ext-Doc
+
+= Introduction =
+
+Several tags are best described at the attribute-level as they describe class properties in great detail. These include:
+
+  * @property and @type
+  * @method, @param and @return
+  * @event
+
+== 1.0 @property and @type ==
+
+Example:
+{{{
+MyClass = function() {
+  /*
+   * @property
+   * @type string
+   */
+  this.name = 'Steve';
+};
+}}}
+
+== 2.0 @method, @param and @return ==
+
+Example:
+{{{
+MyClass = function() {
+  /*
+   * @method
+   * @param {type} someParameter A description of the parameter
+   * @return returnValue A description of the value returned by this method
+   */
+  this.refresh = function(someParameter) {
+    //some functional logic
+    return returnValue;
+  };
+};
+}}}
+
+== 3.0 @event ==
+
+Example:
+{{{
+MyClass = function() {
+  /*
+   * @event
+   */
+  this.myEvent = null;
+};
+}}}
