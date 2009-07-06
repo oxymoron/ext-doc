@@ -1,82 +1,26 @@
-#summary Specification
+#summary Specification of all tags supported by Ext-Doc
 #labels Featured
 
-= 1 Supported tags =
+= 1.0 [ClassTags Class-level] =
 
-Full list of tags:
+  * @class
+  * @namespace
+  * @extends
+  * @singleton
+  * @cfg
+  * @constructor and @param
 
- == 1.1 @class ==
+= 2.0 [AttributeTags Attribute-level] =
 
-Format: 
+  * @property and @type
+  * @method, @param and @return
+  * @event
 
-*@class [class-name] [class-description]*
-
-*class-name* : Full class name
-
-*class-description*: Class description
-
-Example: 
-
-{{{
-/**
- * @class SamplePackage.MyClass
- * This is a sample class
- */
-}}}
-
-
- == 1.2 @extends ==
-
-This tag is used in class declaration to specify class parent.
-
-Format: 
-
-*@extends [parent-class] [class-description]*
-
-*parent-class* : Full class name
-
-*class-description*: Current class (!) description
-
-Example: 
-
-{{{
-/**
- * @class SamplePackage.MyClass
- * @extends SamplePackage.ParentClass
- * This is a sample class (this is a description of SamplePackage.MyClass!)
- */
-}}}
-
-
+= 3.0 Other =
 
  * @ignore
- * @constructor
- * @property
- * @return
- * @param
  * @member
- * @cfg
-
  * @static
- * @type
- * @singleton
- * @event
  * @hide
  * @private
- * @method
- * @namespace
  * @link
-
-= 2 Custom tags =
-
-
-= 3 Docs =
-
- * Class
-
-== 3.1 Attributes ==
-
- * Config
- * Property
- * Method
- * Event
