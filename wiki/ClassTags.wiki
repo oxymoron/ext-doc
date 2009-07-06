@@ -24,7 +24,7 @@ The @class tag displays any text after the class name as a description of that c
 
 Example:
 {{{
-/*
+/**
  * @class MyClassName A description of MyClassName
  * /
 }}}
@@ -40,7 +40,7 @@ The @namespace tag is not required and does not allow for a description.
 
 Example:
 {{{
-/*
+/**
  * @class SamplePackage.MyClassName A description of MyClassName
  * @namespace SamplePackage
  * /
@@ -57,7 +57,7 @@ The @extends tag is not required and does not allow for a description.
 
 Example:
 {{{
-/*
+/**
  * @class MyClassName A description of MyClassName
  * @extends ParentClass
  * /
@@ -75,7 +75,7 @@ The @singleton tag is not required and does not allow for a description.
 
 Example:
 {{{
-/*
+/**
  * @class MyClassName A description of MyClassName
  * @singleton
  * /
@@ -95,7 +95,7 @@ The @config tag is not required, but is formatted with:
 
 Example:
 {{{
-/*
+/**
  * @class MyClassName A description of MyClassName
  * @cfg {type} optionA A description of the configuration option
  * @cfg {type} optionB A description of the configuration option
@@ -118,7 +118,7 @@ Any @param tags which are defined are formatted as:
 
 Example:
 {{{
-/*
+/**
  * @class MyClassName A description of MyClassName
  * @constructor
  * @param {type} myParameter A description of the parameter
@@ -130,7 +130,7 @@ Example:
 Assuming your class needs more than one of the above tags, you might document your class as follows:
 
 {{{
-/*
+/**
  * @class Car.Radio A simple car radio
  * @namespace Car
  * @extends ElectronicThing
