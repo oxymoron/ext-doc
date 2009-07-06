@@ -20,7 +20,7 @@ The @property tag is not required and does not allow for a description. However,
 Example:
 {{{
 MyClass = function() {
-  /*
+  /**
    * @property
    * @type string
    */
@@ -49,7 +49,7 @@ The @return tag is formatted as:
 Example:
 {{{
 MyClass = function() {
-  /*
+  /**
    * @method
    * @param {type} someParameter A description of the parameter
    * @return returnValue A description of the value returned by this method
