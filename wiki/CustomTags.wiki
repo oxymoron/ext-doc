@@ -45,7 +45,7 @@ The resulting HTML of the above custom tag would be:
 The next step is to add your custom tag to your JavaScript documentation comments. The "name" attribute you defined in the XML file is now the name of your new tag. In the case of our example, the custom "default" tag would be used as @default:
 
 {{{
-/*
+/**
  * @property
  * @type string
  * @default 'This is our default string value.'
