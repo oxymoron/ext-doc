@@ -1,126 +1,73 @@
-#summary Class-level Ext-Doc tags.
+#summary Descriptions and examples of class-level tags supported by Ext-Doc.
 
 = Introduction =
 
-Classes are the most basic and important pieces of information to document properly. Below is an explanation of the class-level documentation tags supported by Ext-Doc.
+Several tags are best defined at the class-level as they describe the class in specific detail. These include:
 
   * @class
   * @namespace
   * @extends
   * @singleton
   * @cfg
-  * @constructor
-  * @param
-  
-== 1.0 @class ==
+  * @constructor and @param
 
-The @class tag is used to define a class and must be defined in order for your class to be displayed in the output documentation.
+
+== 1.0 @class ==
 
 Example:
 {{{
 /*
- * @class MyClassName A description about the class
+ * @class MyClassName A description of MyClassName
  * /
 }}}
 
 == 1.1 @namespace ==
 
-The @namespace tag is used to organize classes into specified namespaces or structured architecture. It is defined after the @class tag and not required.
-
 Example:
 {{{
 /*
- * @class SamplePackage.MyClassName A description about the class
+ * @class SamplePackage.MyClassName A description of MyClassName
  * @namespace SamplePackage
  * /
 }}}
 
-Any class defined with a namespace will be displayed in the documentation tree underneath the specified namespace node.
-
 == 1.2 @extends ==
-
-The @extends tag is used to show that a class extends (or inherits) properties, data, or functionality from another class. It is defined after the @class tag and not required.
 
 Example:
 {{{
 /*
- * @class MyClassName A description about the class
+ * @class MyClassName A description of MyClassName
  * @extends ParentClass
  * /
 }}}
 
 == 1.3 @singleton ==
 
-The @singleton tag notes that a class is static (i.e. there can be no new instances of this class). It is defined after the @class tag and not required. 
-
-The @singleton tag has no description.
-
 Example:
 {{{
 /*
- * @class MyClassName A description about the class
+ * @class MyClassName A description of MyClassName
  * @singleton
  * /
 }}}
 
-Any class defined as a singleton will have a singleton icon in the documentation tree.
-
 == 1.4 @cfg ==
-
-The @cfg tag is used to document possible configuration parameters. It is defined after the @class tag and not required. More than one @cfg tag may be listed.
-
-The @cfg tag notes the parameter's type (between a set of curly braces), the parameter's name, as well as a description of the parameter.
 
 Example:
 {{{
 /*
- * @class MyClassName A description about the class
- * @cfg {type} configName A description of this configuration parameter
- * @cfg {type} configName A description of this configuration parameter
+ * @class MyClassName A description of MyClassName
+ * @cfg {type} option A description of the configuration option
  * /
 }}}
-
-Any class defining configuration parameters will have those parameters listed in the top-most section of the class documentation called "Config Options".
 
 == 1.5 @constructor ==
 
-The @constructor tag defines a constructor for the class. It is defined after the @class tag and not required.
-
-The @constructor tag has no description, though it should be followed by any necessary @param tags which describe how the constructor is used.
-
-The @param tag defines a parameter passed into the constructor. It notes the parameter's type (between a set of curly braces), the parameter's name, as well as a description of the parameter. More than one @param tag may be defined.
-
 Example:
 {{{
 /*
- * @class MyClassName A description about the class
+ * @class MyClassName A description of MyClassName
  * @constructor
- * @param {type} parameterOne A description of the parameter.
- * @param {type} parameterOne A description of the parameter.
+ * @param {type} myParameter A description of the parameter
  * /
-}}}
-
-Any class defining its constructor will output the constructor as the first method listed in the class documentation section "Public Methods".
-
-
-= All Together =
-
-If you wanted to define several of the above tags for a given class, the code might look like:
-
-{{{
-/*
- * @class Car.Radio
- * This class does something really cool!
- * @namespace Car
- * @cfg {integer} numOfButtons 
- * The number of buttons on this radio.
- * @cfg {boolean} hasCdPlayer 
- * True if the car has a CD player; otherwise False
- * @constructor
- * @param {object} configObj
- * An object defining the configuration parameters for this class.
- */
-Car.Radio = function(configObj) {
-  ...
-};
 }}}
