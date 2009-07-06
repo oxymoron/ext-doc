@@ -1,0 +1,5 @@
+#summary How to define custom tags for Ext-Doc
+
+= Introduction =
+
+_Documentation coming soon..._
