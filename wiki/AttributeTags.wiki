@@ -4,11 +4,34 @@
 
 Several tags are best described at the attribute-level as they describe class properties in great detail. These include:
 
+  * @cfg
   * @property and @type
   * @method, @param and @return
   * @event
 
-== 1.0 @property and @type ==
+== 1.0 @cfg ==
+
+The @cfg tag defines possible configuration parameters for the class. In most cases, the @cfg tag is used at the [ClassTags Class-Level] as a stand-alone tag; however, it is available at the attribute-level for convenience.
+
+It tells the Ext-Doc documentation generator:
+  * to create a "Config Options" section at the top of the class documentation page
+
+The @config tag is not required, but is formatted with:
+  * the type of the parameter (noted between a pair of curly braces)
+  * the name of the parameter
+  * a description of the parameter
+
+Example:
+{{{
+MyClass = function(configObj) {
+  /**
+   * @cfg {string} name The name of our MyClass instance
+   */
+  this.name = configObj.name;
+};
+}}}
+
+== 2.0 @property and @type ==
 
 The @property tag defines a non-functional class attribute.
 
@@ -28,7 +51,7 @@ MyClass = function() {
 };
 }}}
 
-== 2.0 @method, @param and @return ==
+== 3.0 @method, @param and @return ==
 
 The @method tag defines a functional class attribute.
 
@@ -61,6 +84,6 @@ MyClass = function() {
 };
 }}}
 
-== 3.0 @event ==
+== 4.0 @event ==
 
 _Documentation coming soon..._
