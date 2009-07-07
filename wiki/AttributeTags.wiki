@@ -51,6 +51,8 @@ MyClass = function() {
 };
 }}}
 
+*NOTE:* Properties may be declared without the @property tag (using just the @type or any custom tags), as Ext-Doc will parse the code after doc-declaration to check if this is a method or property. However, it is encouraged to use the @property tag for clarity within your own code.
+
 == 3.0 @method, @param and @return ==
 
 The @method tag defines a functional class attribute.
@@ -83,6 +85,8 @@ MyClass = function() {
   };
 };
 }}}
+
+*NOTE:* Methods may be declared without the @method tag (using just the @param, @return or any custom tags), as Ext-Doc will parse the code after doc-declaration to check if this is a method or property. However, it is encouraged to use the @method tag for clarity within your own code.
 
 == 4.0 @event ==
 
