@@ -90,4 +90,37 @@ MyClass = function() {
 
 == 4.0 @event ==
 
-_Documentation coming soon..._
+The @event tag defines some observable event managed by the class.
+
+It tells the Ext-Doc documentation generator:
+  * to list the event in the "Public Events" section of the class documentation page
+
+The @event tag is not required. It is formatted as:
+  * the event's name
+  * a description of the event
+
+The @event tag is usually followed by @param tags describing any parameters passed to the event's handler method.
+
+The @param tag is formatted as:
+  * the type of the paramter (contained within a set of curly braces)
+  * the parameter's name
+  * a description of the parameter
+
+Example:
+{{{
+MyClass = {
+  initComponent : function(){
+    Ext.Button.superclass.initComponent.call(this);
+
+    this.addEvents(
+      /**
+       * @event click
+       * Fires when this button is clicked
+       * @param {Button} this
+       * @param {EventObject} e The click event
+       */
+      "click"
+    );
+  }
+};
+}}}
