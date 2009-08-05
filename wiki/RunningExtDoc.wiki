@@ -1,4 +1,4 @@
-#A step-by-step tutorial on getting Ext-Doc running.
+# A step-by-step tutorial on getting Ext-Doc running.
 
 = Introduction =
 
