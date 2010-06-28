@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.extdoc</groupId>
 	<artifactId>extdoc-core</artifactId>
-	<name>ext-doc</name>
+	<name>ext-doc-core</name>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>ext-doc core module</description>

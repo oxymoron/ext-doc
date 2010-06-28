@@ -14,6 +14,6 @@
 	</scm>
 	<modules>
 		<module>extdoc-cli</module>
-		<module>ext-doc-core</module>
+		<module>extdoc-core</module>
 	</modules>
 </project>
