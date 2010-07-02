@@ -1,6 +1,8 @@
 package extdoc;
 
+import extdoc.exceptions.WrongCliException;
 import extdoc.jsdoc.processor.FileProcessor;
+import extdoc.jsdoc.processor.FileProcessorImpl;
 import org.apache.commons.cli.*;
 
 /**
@@ -26,6 +28,43 @@ public class Main {
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
 
+        prepareOptions();
+        try {
+            FileProcessor fileProcessor = new FileProcessorImpl();
+            processCli(fileProcessor, args);
+        } catch (WrongCliException e) {
+            wrongCli(e.getMessage());
+        }
+    }
+
+    public static void processCli(FileProcessor processor, String[] args) throws WrongCliException {
+        CommandLineParser parser = new PosixParser();
+        try {
+            CommandLine cmd = parser.parse( options, args);
+            if(cmd.hasOption("project")||cmd.hasOption("source")){
+
+                if(cmd.hasOption("quiet")){
+                    processor.setQuiet();
+                }else if (cmd.hasOption("verbose")){
+                    processor.setVerbose();
+                }
+                processor.process(
+                        cmd.getOptionValue("project"),
+                        cmd.getOptionValues("source")
+                );
+                processor.saveToFolder(
+                    cmd.getOptionValue("output"),
+                    cmd.getOptionValue("template"));
+            }else{
+                throw new WrongCliException("Project XML file or source files should be specified");
+            }
+        } catch (ParseException e) {
+            throw new WrongCliException(e);
+        }
+    }
+
+    public static void prepareOptions() {
+        
         options = new Options();
 
         Option quiet = new Option("q", "quiet", false, "be extra quiet");
@@ -65,30 +104,5 @@ public class Main {
         options.addOption(output);
         options.addOption(template);
         options.addOption(source);
-
-        CommandLineParser parser = new PosixParser();
-        try {
-            CommandLine cmd = parser.parse( options, args);
-            if(cmd.hasOption("project")||cmd.hasOption("source")){
-                FileProcessor processor = new FileProcessor();
-
-                if(cmd.hasOption("quiet")){
-                    processor.setQuiet();
-                }else if (cmd.hasOption("verbose")){
-                    processor.setVerbose();
-                }                
-                processor.process(
-                        cmd.getOptionValue("project"),
-                        cmd.getOptionValues("source")
-                );
-                processor.saveToFolder(
-                    cmd.getOptionValue("output"),
-                    cmd.getOptionValue("template"));
-            }else{
-                wrongCli("Project XML file or source files should be specified");    
-            }
-        } catch (ParseException e) {
-            wrongCli(e.getMessage());
-        }
     }
 }
