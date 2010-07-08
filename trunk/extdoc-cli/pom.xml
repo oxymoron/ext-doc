@@ -24,6 +24,7 @@
             <artifactId>maven-jar-plugin</artifactId>
             <version>2.3.1</version>
             <configuration>
+                <finalName>ext-doc</finalName>
                 <archive>
                     <manifest>                        
                         <addClasspath>true</addClasspath>

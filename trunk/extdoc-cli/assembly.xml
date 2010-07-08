@@ -12,7 +12,8 @@
         <include>${project.basedir}/README*</include>
         <include>${project.basedir}/LICENSE*</include>
         <include>${project.basedir}/NOTICE*</include>
-        <include>${project.basedir}/sample/*.*</include>
+        <include>${project.basedir}/sample/**</include>
+        <include>${project.basedir}/template/**</include>
       </includes>
     </fileSet>
     <fileSet>
