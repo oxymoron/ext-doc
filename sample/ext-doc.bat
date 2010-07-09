@@ -1,1 +1,0 @@
-java -jar ../ext-doc.jar -p sample.prj -o c:\wamp\www\ext-doc -s sample.js -verbose
