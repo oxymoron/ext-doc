@@ -97,20 +97,20 @@ public class FileProcessorImpl implements FileProcessor {
     private String[] processLink(String text) {
          StringUtils.ClsAttrName res = StringUtils.processLink(text);
          String longText, shortText;
-         if (res.attr.isEmpty()) {
+         if (res.attr.equals("")) {
              // class reference
              String cls = res.cls;
-             String name = res.name.isEmpty() ? res.cls : res.name;
+             String name = res.name.equals("") ? res.cls : res.name;
              longText = MessageFormat.format(CLASS_REFERENCE_TPL, cls, name);
              shortText = name;
          } else {
              // attribute reference
-             String cls = res.cls.isEmpty() ? context.getCurrentClass().className
+             String cls = res.cls.equals("") ? context.getCurrentClass().className
                      : res.cls;
              String attr = res.attr;
              String name;
-             if (res.name.isEmpty()) {
-                 if (res.cls.isEmpty()) {
+             if (res.name.equals("")) {
+                 if (res.cls.equals("")) {
                      name = res.attr;
                  } else {
                      name = cls + '.' + res.attr;
@@ -422,7 +422,7 @@ public class FileProcessorImpl implements FileProcessor {
         method.shortClassName = doc!=null?doc.shortClassName:null;
         method.name = StringUtils.separatePackage(extraLine)[1];
         if (methodTag!=null){
-            if (!methodTag.text().isEmpty()){
+            if (!methodTag.text().equals("")){
                 method.name = methodTag.text();
             }
         }
@@ -681,7 +681,7 @@ public class FileProcessorImpl implements FileProcessor {
     }
 
     private <T extends DocAttribute> boolean isOverridden(T doc, List<T> docs){
-        if (doc.name == null || doc.name.isEmpty()) return false;
+        if (doc.name == null || doc.name.equals("")) return false;
         for(DocAttribute attr:docs){
             String docName = StringUtils.separateByLastDot(doc.name)[1];
             String attrName = StringUtils.separateByLastDot(attr.name)[1];
